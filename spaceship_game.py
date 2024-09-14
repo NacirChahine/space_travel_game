@@ -34,6 +34,32 @@ def draw_spaceship(x, y):
 def draw_asteroid(x, y):
     screen.blit(asteroid_img, (x, y))
 
+# Display the game over screen
+def show_game_over_screen(score):
+    screen.fill(BLACK)
+    font = pygame.font.SysFont(None, 55)
+    text = font.render("Game Over!", True, WHITE)
+    screen.blit(text, (SCREEN_WIDTH // 2 - text.get_width() // 2, SCREEN_HEIGHT // 2 - 50))
+
+    score_text = font.render(f"Score: {score}", True, WHITE)
+    screen.blit(score_text, (SCREEN_WIDTH // 2 - score_text.get_width() // 2, SCREEN_HEIGHT // 2))
+
+    pygame.display.flip()
+    pygame.time.delay(3000)  # Show the screen for 3 seconds before closing
+
+# Display ending screen when the game is completed
+def show_end_screen():
+    screen.fill(BLACK)
+    font = pygame.font.SysFont(None, 55)
+    text = font.render("Spaceship Arrived at Destination!", True, WHITE)
+    screen.blit(text, (SCREEN_WIDTH // 2 - text.get_width() // 2, SCREEN_HEIGHT // 2 - 50))
+
+    astronaut_text = font.render("Astronaut Safe!", True, WHITE)
+    screen.blit(astronaut_text, (SCREEN_WIDTH // 2 - astronaut_text.get_width() // 2, SCREEN_HEIGHT // 2 + 50))
+
+    pygame.display.flip()
+    pygame.time.delay(3000)  # Show the screen for 3 seconds before closing
+
 # Game loop
 def game_loop():
     spaceship_x = (SCREEN_WIDTH - SPACESHIP_WIDTH) // 2
@@ -45,7 +71,10 @@ def game_loop():
     asteroid_speed = 5
 
     score = 0
+    level = 1
+    max_score_to_win = 20  # Game ends when player reaches score of 20
     game_over = False
+    player_won = False
 
     while not game_over:
         # Event handling
@@ -66,6 +95,9 @@ def game_loop():
             asteroid_y = -ASTEROID_HEIGHT
             asteroid_x = random.randint(0, SCREEN_WIDTH - ASTEROID_WIDTH)
             score += 1
+            if score % 5 == 0:  # Increase level every 5 points
+                level += 1
+                asteroid_speed += 1  # Make the game harder by increasing asteroid speed
 
         # Check for collision
         if (
@@ -76,6 +108,11 @@ def game_loop():
         ):
             game_over = True
 
+        # Check if player has won
+        if score >= max_score_to_win:
+            player_won = True
+            game_over = True
+
         # Fill the screen with black
         screen.fill(BLACK)
 
@@ -83,16 +120,24 @@ def game_loop():
         draw_spaceship(spaceship_x, spaceship_y)
         draw_asteroid(asteroid_x, asteroid_y)
 
-        # Display the score
+        # Display the score and level
         font = pygame.font.SysFont(None, 36)
-        text = font.render(f"Score: {score}", True, WHITE)
-        screen.blit(text, (10, 10))
+        score_text = font.render(f"Score: {score}", True, WHITE)
+        level_text = font.render(f"Level: {level}", True, WHITE)
+        screen.blit(score_text, (10, 10))
+        screen.blit(level_text, (SCREEN_WIDTH - 150, 10))
 
         # Update the display
         pygame.display.flip()
 
         # Cap the frame rate
         clock.tick(60)
+
+    # Show appropriate end screen
+    if player_won:
+        show_end_screen()
+    else:
+        show_game_over_screen(score)
 
     # End the game
     pygame.quit()
