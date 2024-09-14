@@ -3,14 +3,21 @@
 A simple 2D spaceship game built with Python and Pygame. The player controls a spaceship to avoid falling asteroids, progressing through increasingly challenging levels. Each level increases the speed and number of asteroids.
 
 ## Features
-- Move the spaceship left and right to avoid asteroids.
+- Multiple Asteroids: As the player progresses, the number of asteroids increases, adding to the challenge.
+- Lives System: The player starts with 3 lives. Colliding with an asteroid reduces lives. The game ends when all lives are lost.
+- Improved Graphics: The spaceship, asteroids, and power-ups have better shapes and visuals. (More graphical updates can be added later.)
+- Pause and Resume: Press P to pause the game and see a "Game Paused" screen. Press P again to resume.
 - Levels increase as you score points, making the game harder.
-- Infinite gameplay with increasing difficulty.
+- Power-ups give temporary advantages like additional lives or extra speed.
+- Reach a score of 50 to win the game and display the "You Win!" screen.
 
 ## How to Play
 - Use the **Left** and **Right Arrow Keys** to move the spaceship.
+- Use the Left and Right Arrow Keys to move the spaceship.
 - Avoid getting hit by the asteroids.
-- Survive as long as you can and reach higher levels!
+- Collect power-ups to gain extra lives or speed.
+- nSurvive as long as you can and reach higher levels!
+- Press P to pause or resume the game.
 
 ## Installation
 
