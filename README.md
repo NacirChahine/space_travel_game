@@ -32,6 +32,6 @@ A simple 2D spaceship game built with Python and Pygame. The player controls a s
 - Pygame
 
 ## Screenshots
-![image](https://github.com/user-attachments/assets/ab68a19c-9cff-481c-9255-8c1c756e9c07)
+![Screenshot 2024-09-14 081742](https://github.com/user-attachments/assets/f8959a9c-5150-41e5-8f7a-323e616f250e)
 
 Enjoy the game! 🚀
