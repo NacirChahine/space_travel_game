@@ -72,7 +72,7 @@ def game_loop():
 
     score = 0
     level = 1
-    max_score_to_win = 20  # Game ends when player reaches score of 20
+    max_score_to_win = 50  # Game ends when player reaches score of 50
     game_over = False
     player_won = False
 
