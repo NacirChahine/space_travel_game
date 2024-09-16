@@ -1,5 +1,7 @@
 import pygame
 import random
+import os
+import struct
 
 # Initialize Pygame
 pygame.init()
@@ -13,6 +15,7 @@ WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
 POWERUP_LIFE = 1
 POWERUP_SPEED = 2
+HIGHSCORE_FILE = 'highscore.dat'
 
 # Set up display
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
@@ -48,6 +51,18 @@ space_facts = [
     "There could be 500 million planets capable of supporting life in our galaxy.",
 ]
 
+# Load high score from binary file
+def load_high_score():
+    if os.path.exists(HIGHSCORE_FILE):
+        with open(HIGHSCORE_FILE, 'rb') as file:
+            return struct.unpack('I', file.read())[0]
+    return 0
+
+# Save high score to binary file
+def save_high_score(score):
+    with open(HIGHSCORE_FILE, 'wb') as file:
+        file.write(struct.pack('I', score))
+
 # Function to draw the spaceship
 def draw_spaceship(x, y):
     screen.blit(spaceship_img, (x, y))
@@ -75,14 +90,17 @@ def draw_lives(lives):
     screen.blit(lives_text, (SCREEN_WIDTH - 150, 50))
 
 # Display the game over screen with space facts
-def show_game_over_screen(score):
+def show_game_over_screen(score, high_score):
     screen.fill(BLACK)
     font = pygame.font.SysFont(None, 55)
     text = font.render("Game Over!", True, WHITE)
-    screen.blit(text, (SCREEN_WIDTH // 2 - text.get_width() // 2, SCREEN_HEIGHT // 2 - 50))
+    screen.blit(text, (SCREEN_WIDTH // 2 - text.get_width() // 2, SCREEN_HEIGHT // 2 - 100))
 
     score_text = font.render(f"Score: {score}", True, WHITE)
-    screen.blit(score_text, (SCREEN_WIDTH // 2 - score_text.get_width() // 2, SCREEN_HEIGHT // 2))
+    screen.blit(score_text, (SCREEN_WIDTH // 2 - score_text.get_width() // 2, SCREEN_HEIGHT // 2 - 50))
+
+    high_score_text = font.render(f"High Score: {high_score}", True, WHITE)
+    screen.blit(high_score_text, (SCREEN_WIDTH // 2 - high_score_text.get_width() // 2, SCREEN_HEIGHT // 2))
 
     # Pick a random space fact
     random_fact = random.choice(space_facts)
@@ -94,7 +112,7 @@ def show_game_over_screen(score):
     pygame.time.delay(5000)  # Show the screen for 5 seconds before closing
 
 # Display the victory screen
-def show_end_screen():
+def show_end_screen(high_score):
     screen.fill(BLACK)
     font = pygame.font.SysFont(None, 55)
     text = font.render("Spaceship Arrived at Destination!", True, WHITE)
@@ -102,6 +120,9 @@ def show_end_screen():
 
     astronaut_text = font.render("Astronaut Safe!", True, WHITE)
     screen.blit(astronaut_text, (SCREEN_WIDTH // 2 - astronaut_text.get_width() // 2, SCREEN_HEIGHT // 2 + 50))
+
+    high_score_text = font.render(f"High Score: {high_score}", True, WHITE)
+    screen.blit(high_score_text, (SCREEN_WIDTH // 2 - high_score_text.get_width() // 2, SCREEN_HEIGHT // 2 + 100))
 
     pygame.display.flip()
     pygame.time.delay(5000)  # Show the screen for 5 seconds before closing
@@ -131,9 +152,11 @@ def game_loop():
     score = 0
     level = 1
     paused = False
-    max_score_to_win = 50
+    max_score_to_win = 150
     game_over = False
     player_won = False
+
+    high_score = load_high_score()
 
     while not game_over:
         # Event handling
@@ -167,7 +190,7 @@ def game_loop():
                 asteroid['y'] = -ASTEROID_HEIGHT
                 asteroid['x'] = random.randint(0, SCREEN_WIDTH - ASTEROID_WIDTH)
                 score += 1
-                if score % 5 == 0:  # Increase level every 5 points
+                if score % 5 == 0:
                     level += 1
                     for ast in asteroids:
                         ast['speed'] += 1
@@ -212,11 +235,15 @@ def game_loop():
         # Cap the frame rate
         clock.tick(60)
 
-    # Show appropriate end screen
+    # Update high score and show appropriate end screen
+    if score > high_score:
+        high_score = score
+        save_high_score(high_score)
+
     if player_won:
-        show_end_screen()
+        show_end_screen(high_score)
     else:
-        show_game_over_screen(score)
+        show_game_over_screen(score, high_score)
 
     # End the game
     pygame.quit()
