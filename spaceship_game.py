@@ -3,11 +3,12 @@ import random
 import os
 import struct
 
-# Initialize Pygame
+# Initialize Pygame and the mixer for sound
 pygame.init()
+pygame.mixer.init()
 
 # Constants
-SCREEN_WIDTH, SCREEN_HEIGHT = 800, 600
+SCREEN_WIDTH, SCREEN_HEIGHT = 900, 600
 SPACESHIP_WIDTH, SPACESHIP_HEIGHT = 50, 50
 ASTEROID_WIDTH, ASTEROID_HEIGHT = 50, 50
 POWERUP_WIDTH, POWERUP_HEIGHT = 30, 30
@@ -17,24 +18,36 @@ POWERUP_LIFE = 1
 POWERUP_SPEED = 2
 HIGHSCORE_FILE = 'highscore.dat'
 
+# Load spaceship image
+spaceship_img = pygame.image.load('space_ship.png')
+spaceship_img = pygame.transform.scale(spaceship_img, (SPACESHIP_WIDTH, SPACESHIP_HEIGHT))
+
+# Load asteroid images and randomly assign one during each asteroid spawn
+asteroid_images = [
+    pygame.image.load('asteroid_1.png'),
+    pygame.image.load('asteroid_2.png'),
+    pygame.image.load('asteroid_3.png')
+]
+asteroid_images = [pygame.transform.scale(img, (ASTEROID_WIDTH, ASTEROID_HEIGHT)) for img in asteroid_images]
+
+# Load background images for different levels
+background_images = [
+    pygame.image.load('background-1.jpg'),
+    pygame.image.load('background-2.jpg'),
+    pygame.image.load('background-4.jpg'),
+    pygame.image.load('background-5.jpg'),
+    pygame.image.load('background-6.jpg'),
+    pygame.image.load('background-7.jpg')
+]
+background_images = [pygame.transform.scale(img, (SCREEN_WIDTH, SCREEN_HEIGHT)) for img in background_images]
+
+# Load and loop background music
+pygame.mixer.music.load('drive-breakbeat.mp3')
+pygame.mixer.music.play(-1)  # Loop indefinitely
+
 # Set up display
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 pygame.display.set_caption("Spaceship Game")
-
-# Improved spaceship (triangular shape)
-spaceship_img = pygame.Surface((SPACESHIP_WIDTH, SPACESHIP_HEIGHT), pygame.SRCALPHA)
-pygame.draw.polygon(spaceship_img, (0, 128, 255), [(SPACESHIP_WIDTH // 2, 0), (0, SPACESHIP_HEIGHT), (SPACESHIP_WIDTH, SPACESHIP_HEIGHT)])
-
-# Improved asteroid (circular shape)
-asteroid_img = pygame.Surface((ASTEROID_WIDTH, ASTEROID_HEIGHT), pygame.SRCALPHA)
-pygame.draw.circle(asteroid_img, (128, 128, 128), (ASTEROID_WIDTH // 2, ASTEROID_HEIGHT // 2), ASTEROID_WIDTH // 2)
-
-# Placeholder power-up images (improved shapes)
-powerup_img_life = pygame.Surface((POWERUP_WIDTH, POWERUP_HEIGHT))
-powerup_img_life.fill((0, 255, 0))
-
-powerup_img_speed = pygame.Surface((POWERUP_WIDTH, POWERUP_HEIGHT))
-powerup_img_speed.fill((255, 0, 0))
 
 # Game clock
 clock = pygame.time.Clock()
@@ -68,20 +81,13 @@ def draw_spaceship(x, y):
     screen.blit(spaceship_img, (x, y))
 
 # Function to draw the asteroid
-def draw_asteroid(x, y):
-    screen.blit(asteroid_img, (x, y))
-
-# Function to draw the power-up
-def draw_powerup(x, y, powerup_type):
-    if powerup_type == POWERUP_LIFE:
-        screen.blit(powerup_img_life, (x, y))
-    elif powerup_type == POWERUP_SPEED:
-        screen.blit(powerup_img_speed, (x, y))
+def draw_asteroid(x, y, img):
+    screen.blit(img, (x, y))
 
 # Function to draw multiple asteroids
 def draw_asteroids(asteroids):
     for asteroid in asteroids:
-        draw_asteroid(asteroid['x'], asteroid['y'])
+        draw_asteroid(asteroid['x'], asteroid['y'], asteroid['img'])
 
 # Display lives on screen
 def draw_lives(lives):
@@ -147,12 +153,12 @@ def game_loop():
     extra_speed = 0
 
     num_asteroids = 3
-    asteroids = [{'x': random.randint(0, SCREEN_WIDTH - ASTEROID_WIDTH), 'y': -ASTEROID_HEIGHT, 'speed': 5} for _ in range(num_asteroids)]
+    asteroids = [{'x': random.randint(0, SCREEN_WIDTH - ASTEROID_WIDTH), 'y': -ASTEROID_HEIGHT, 'speed': 5, 'img': random.choice(asteroid_images)} for _ in range(num_asteroids)]
     lives = 3
     score = 0
     level = 1
     paused = False
-    max_score_to_win = 150
+    max_score_to_win = 100
     game_over = False
     player_won = False
 
@@ -189,6 +195,7 @@ def game_loop():
             if asteroid['y'] > SCREEN_HEIGHT:
                 asteroid['y'] = -ASTEROID_HEIGHT
                 asteroid['x'] = random.randint(0, SCREEN_WIDTH - ASTEROID_WIDTH)
+                asteroid['img'] = random.choice(asteroid_images)  # Choose a new random asteroid image
                 score += 1
                 if score % 5 == 0:
                     level += 1
@@ -214,8 +221,9 @@ def game_loop():
             player_won = True
             game_over = True
 
-        # Fill the screen with black
-        screen.fill(BLACK)
+        # Update background according to level
+        current_background = background_images[(level - 1) % len(background_images)]
+        screen.blit(current_background, (0, 0))
 
         # Draw spaceship, asteroids, and power-ups
         draw_spaceship(spaceship_x, spaceship_y)
