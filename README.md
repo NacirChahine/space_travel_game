@@ -4,15 +4,14 @@ A simple 2D spaceship game built with Python and Pygame. The player controls a s
 
 ## Features
 - Multiple Asteroids: As the player progresses, the number of asteroids increases, adding to the challenge.
+- Weapon System: Allow the player to shoot bullets at the asteroids.
 - Lives System: The player starts with 3 lives. Colliding with an asteroid reduces lives. The game ends when all lives are lost.
-- Background Music and Sound Effects: Add background music and sound effects for collisions, etc.
-- Improved Graphics: Replace placeholder shapes with images (spaceship, asteroids, backgrounds).
-- Dynamic Background: Add space backgrounds.
 
 ## How to Play
 - Use the **Left** and **Right Arrow Keys** to move the spaceship.
+- Use the **Space Key** to shoot asteroids.
 - Avoid getting hit by the asteroids.
-- Survive as long as you can and reach higher levels!
+- Survive as long as you can and score higher!
 
 ## Installation
 
