@@ -9,16 +9,12 @@ pygame.init()
 pygame.mixer.init()
 
 # Constants
-SCREEN_WIDTH, SCREEN_HEIGHT = 1000, 600
+SCREEN_WIDTH, SCREEN_HEIGHT = 800, 600
 SPACESHIP_WIDTH, SPACESHIP_HEIGHT = 50, 50
 ASTEROID_WIDTH, ASTEROID_HEIGHT = 50, 50
-POWERUP_WIDTH, POWERUP_HEIGHT = 30, 30
 BULLET_WIDTH, BULLET_HEIGHT = 5, 10
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
-POWERUP_LIFE = 1
-POWERUP_SPEED = 2
-POWERUP_POINTS = 3
 HIGHSCORE_FILE = 'highscore.dat'
 
 # Helper function to get the resource path (needed when bundled as a one-file .exe)
@@ -43,16 +39,6 @@ asteroid_images = [
 ]
 asteroid_images = [pygame.transform.scale(img, (ASTEROID_WIDTH, ASTEROID_HEIGHT)) for img in asteroid_images]
 
-# Load power-up images
-powerup_images = {
-    POWERUP_LIFE: pygame.Surface((POWERUP_WIDTH, POWERUP_HEIGHT)),
-    POWERUP_SPEED: pygame.Surface((POWERUP_WIDTH, POWERUP_HEIGHT)),
-    POWERUP_POINTS: pygame.Surface((POWERUP_WIDTH, POWERUP_HEIGHT))
-}
-powerup_images[POWERUP_LIFE].fill((0, 255, 0))  # Green power-up for life
-powerup_images[POWERUP_SPEED].fill((255, 255, 0))  # Yellow power-up for speed
-powerup_images[POWERUP_POINTS].fill((255, 0, 0))  # Red power-up for extra points
-
 # Load background images for different levels
 background_images = [
     pygame.image.load(resource_path('background-1.jpg')),
@@ -67,6 +53,16 @@ background_images = [pygame.transform.scale(img, (SCREEN_WIDTH, SCREEN_HEIGHT)) 
 # Load and loop background music
 pygame.mixer.music.load(resource_path('drive-breakbeat.mp3'))
 pygame.mixer.music.play(-1)  # Loop indefinitely
+
+# Load sound effects
+fire_sound = pygame.mixer.Sound(resource_path('fire.aiff'))
+asteroid_hit_sound = pygame.mixer.Sound(resource_path('asteroid_hit.wav'))
+crash_sound = pygame.mixer.Sound(resource_path('crash.wav'))
+end_bomb_sound = pygame.mixer.Sound(resource_path('end_bomb.wav'))
+
+# Load logo image for welcome screen
+logo_img = pygame.image.load(resource_path('naro_chan_logo.png'))
+logo_img = pygame.transform.scale(logo_img, (400, 300))
 
 # Set up display
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
@@ -99,240 +95,208 @@ def save_high_score(score):
     with open(HIGHSCORE_FILE, 'wb') as file:
         file.write(struct.pack('I', score))
 
-# Function to draw the spaceship
-def draw_spaceship(x, y):
-    screen.blit(spaceship_img, (x, y))
+# Function to draw buttons
+def draw_button(text, x, y, width, height, font_size=36):
+    font = pygame.font.SysFont(None, font_size)
+    text_render = font.render(text, True, WHITE)
+    pygame.draw.rect(screen, BLACK, [x, y, width, height])
+    screen.blit(text_render, (x + (width - text_render.get_width()) // 2, y + (height - text_render.get_height()) // 2))
+    return pygame.Rect(x, y, width, height)
 
-# Function to draw the asteroid
-def draw_asteroid(x, y, img):
-    screen.blit(img, (x, y))
-
-# Function to draw multiple asteroids
-def draw_asteroids(asteroids):
-    for asteroid in asteroids:
-        draw_asteroid(asteroid['x'], asteroid['y'], asteroid['img'])
-
-# Function to draw power-ups
-def draw_powerups(powerups):
-    for powerup in powerups:
-        screen.blit(powerup['img'], (powerup['x'], powerup['y']))
-
-# Function to draw bullets
-def draw_bullets(bullets):
-    for bullet in bullets:
-        pygame.draw.rect(screen, WHITE, (bullet['x'], bullet['y'], BULLET_WIDTH, BULLET_HEIGHT))
-
-# Display lives on screen
-def draw_lives(lives):
-    font = pygame.font.SysFont(None, 36)
-    lives_text = font.render(f"Lives: {lives}", True, WHITE)
-    screen.blit(lives_text, (SCREEN_WIDTH - 150, 50))
-
-# Display the game over screen with space facts
-def show_game_over_screen(score, high_score):
-    screen.fill(BLACK)
-    font = pygame.font.SysFont(None, 55)
-    text = font.render("Game Over!", True, WHITE)
-    screen.blit(text, (SCREEN_WIDTH // 2 - text.get_width() // 2, SCREEN_HEIGHT // 2 - 100))
-
-    score_text = font.render(f"Score: {score}", True, WHITE)
-    screen.blit(score_text, (SCREEN_WIDTH // 2 - score_text.get_width() // 2, SCREEN_HEIGHT // 2 - 50))
-
-    high_score_text = font.render(f"High Score: {high_score}", True, WHITE)
-    screen.blit(high_score_text, (SCREEN_WIDTH // 2 - high_score_text.get_width() // 2, SCREEN_HEIGHT // 2))
-
-    # Pick a random space fact
+# Function to show the welcome screen
+def show_welcome_screen():
     random_fact = random.choice(space_facts)
     fact_font = pygame.font.SysFont(None, 30)
-    fact_text = fact_font.render(f"Space Fact: {random_fact}", True, WHITE)
-    screen.blit(fact_text, (SCREEN_WIDTH // 2 - fact_text.get_width() // 2, SCREEN_HEIGHT // 2 + 100))
+    
+    while True:
+        screen.fill(BLACK)
+        screen.blit(logo_img, (SCREEN_WIDTH // 2 - logo_img.get_width() // 2, 100))
 
-    pygame.display.flip()
-    pygame.time.delay(5000)  # Show the screen for 5 seconds before closing
+        font = pygame.font.SysFont(None, 55)
+        title_text = font.render("Welcome to the Spaceship Game!", True, WHITE)
+        screen.blit(title_text, (SCREEN_WIDTH // 2 - title_text.get_width() // 2, 50))
 
-# Display the victory screen
-def show_end_screen(high_score):
-    screen.fill(BLACK)
-    font = pygame.font.SysFont(None, 55)
-    text = font.render("Spaceship Arrived at Destination!", True, WHITE)
-    screen.blit(text, (SCREEN_WIDTH // 2 - text.get_width() // 2, SCREEN_HEIGHT // 2 - 50))
+        fact_text = fact_font.render(f"Did you know? {random_fact}", True, WHITE)
+        screen.blit(fact_text, (SCREEN_WIDTH // 2 - fact_text.get_width() // 2, 450))
 
-    astronaut_text = font.render("Astronaut Safe!", True, WHITE)
-    screen.blit(astronaut_text, (SCREEN_WIDTH // 2 - astronaut_text.get_width() // 2, SCREEN_HEIGHT // 2 + 50))
+        start_text = font.render("Press ENTER to Start", True, WHITE)
+        screen.blit(start_text, (SCREEN_WIDTH // 2 - start_text.get_width() // 2, 500))
 
-    high_score_text = font.render(f"High Score: {high_score}", True, WHITE)
-    screen.blit(high_score_text, (SCREEN_WIDTH // 2 - high_score_text.get_width() // 2, SCREEN_HEIGHT // 2 + 100))
+        pygame.display.update()
 
-    pygame.display.flip()
-    pygame.time.delay(5000)  # Show the screen for 5 seconds before closing
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_RETURN:
+                    return
 
-# Display the pause screen
-def show_pause_screen():
-    screen.fill(BLACK)
-    font = pygame.font.SysFont(None, 55)
-    text = font.render("Game Paused", True, WHITE)
-    screen.blit(text, (SCREEN_WIDTH // 2 - text.get_width() // 2, SCREEN_HEIGHT // 2 - 50))
+# Function to show the end screen with replay and exit buttons
+def show_end_screen(score, high_score):
+    while True:
+        screen.fill(BLACK)
+        font = pygame.font.SysFont(None, 55)
+        title_text = font.render("Game Over!", True, WHITE)
+        screen.blit(title_text, (SCREEN_WIDTH // 2 - title_text.get_width() // 2, 50))
 
-    resume_text = font.render("Press 'P' to Resume", True, WHITE)
-    screen.blit(resume_text, (SCREEN_WIDTH // 2 - resume_text.get_width() // 2, SCREEN_HEIGHT // 2 + 50))
+        score_text = font.render(f"Score: {score}", True, WHITE)
+        screen.blit(score_text, (SCREEN_WIDTH // 2 - score_text.get_width() // 2, 150))
 
-    pygame.display.flip()
+        high_score_text = font.render(f"High Score: {high_score}", True, WHITE)
+        screen.blit(high_score_text, (SCREEN_WIDTH // 2 - high_score_text.get_width() // 2, 200))
 
+        # Play final explosion sound once when game over
+        end_bomb_sound.play()
+
+        # Draw buttons
+        replay_button = draw_button("Replay", SCREEN_WIDTH // 2 - 100, 300, 200, 50)
+        exit_button = draw_button("Exit", SCREEN_WIDTH // 2 - 100, 400, 200, 50)
+
+        pygame.display.update()
+
+        # Event handling for buttons
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if replay_button.collidepoint(event.pos):
+                    return "replay"
+                if exit_button.collidepoint(event.pos):
+                    pygame.quit()
+                    sys.exit()
+
+# Function to check if bullet hits an asteroid
+def bullet_hits_asteroid(bullet, asteroid):
+    return pygame.Rect(bullet['x'], bullet['y'], BULLET_WIDTH, BULLET_HEIGHT).colliderect(
+        pygame.Rect(asteroid['x'], asteroid['y'], ASTEROID_WIDTH, ASTEROID_HEIGHT))
+
+# Function to check if spaceship hits an asteroid
+def spaceship_hits_asteroid(x, y, asteroid):
+    spaceship_rect = pygame.Rect(x, y, SPACESHIP_WIDTH, SPACESHIP_HEIGHT)
+    asteroid_rect = pygame.Rect(asteroid['x'], asteroid['y'], ASTEROID_WIDTH, ASTEROID_HEIGHT)
+    return spaceship_rect.colliderect(asteroid_rect)
 
 # Game loop
 def game_loop():
-    spaceship_x = (SCREEN_WIDTH - SPACESHIP_WIDTH) // 2
-    spaceship_y = SCREEN_HEIGHT - SPACESHIP_HEIGHT - 10
-    spaceship_speed = 5
-    extra_speed = 0
-    shield_active = False
-    shield_duration = 300  # Shield lasts for 5 seconds (300 frames at 60fps)
-
-    num_asteroids = 3
-    asteroids = [{'x': random.randint(0, SCREEN_WIDTH - ASTEROID_WIDTH), 'y': -ASTEROID_HEIGHT, 'speed': 5, 'img': random.choice(asteroid_images)} for _ in range(num_asteroids)]
-    powerups = []
+    x, y = SCREEN_WIDTH // 2, SCREEN_HEIGHT - SPACESHIP_HEIGHT - 10
+    x_change = 0
+    left_key, right_key = False, False  # Track key states
+    asteroids = []
     bullets = []
-    bullet_speed = 7
-    lives = 3
     score = 0
-    level = 1
-    max_score_to_win = 500
-    game_over = False
-    player_won = False
+    lives = 3
+    high_score = load_high_score()
+    asteroid_speed = 5  # Initial speed of asteroids
+    background_index = 0
+
+    asteroid_event = pygame.USEREVENT + 1
+    pygame.time.set_timer(asteroid_event, 1000)  # Add a new asteroid every 1 second
+
     paused = False
 
-    high_score = load_high_score()
+    while True:
+        screen.blit(background_images[background_index], (0, 0))
 
-    # Game loop
-    while not game_over:
-        # Event handling
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                game_over = True
+                pygame.quit()
+                sys.exit()
             if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_p:
-                    paused = not paused
-                    if paused:
-                        show_pause_screen()
-                        pygame.mixer.music.pause()
-                    else:
-                        pygame.mixer.music.unpause()
-                if event.key == pygame.K_SPACE and not paused:
-                    bullets.append({'x': spaceship_x + SPACESHIP_WIDTH // 2 - BULLET_WIDTH // 2, 'y': spaceship_y})
+                if event.key == pygame.K_LEFT:
+                    left_key = True
+                if event.key == pygame.K_RIGHT:
+                    right_key = True
+                if event.key == pygame.K_SPACE:
+                    # Fire bullet
+                    fire_sound.play()
+                    bullets.append({'x': x + SPACESHIP_WIDTH // 2 - BULLET_WIDTH // 2, 'y': y})
 
-        if paused:
-            continue
+            if event.type == pygame.KEYUP:
+                if event.key == pygame.K_LEFT:
+                    left_key = False
+                if event.key == pygame.K_RIGHT:
+                    right_key = False
 
-        # Spaceship movement
-        keys = pygame.key.get_pressed()
-        if keys[pygame.K_LEFT] and spaceship_x > 0:
-            spaceship_x -= spaceship_speed + extra_speed
-        if keys[pygame.K_RIGHT] and spaceship_x < SCREEN_WIDTH - SPACESHIP_WIDTH:
-            spaceship_x += spaceship_speed + extra_speed
+            if event.type == asteroid_event:
+                # Add new asteroid at random x position
+                asteroids.append({'x': random.randint(0, SCREEN_WIDTH - ASTEROID_WIDTH), 'y': 0, 'img': random.choice(asteroid_images)})
 
-        # Bullet movement
-        bullets = [{'x': b['x'], 'y': b['y'] - bullet_speed} for b in bullets if b['y'] > 0]
+        # Smooth spaceship movement logic
+        if left_key:
+            x_change = -5
+        elif right_key:
+            x_change = 5
+        else:
+            x_change = 0
 
-        # Asteroid movement
+        # Update spaceship position
+        x += x_change
+        if x < 0:
+            x = 0
+        elif x > SCREEN_WIDTH - SPACESHIP_WIDTH:
+            x = SCREEN_WIDTH - SPACESHIP_WIDTH
+
+        # Update bullet positions
+        bullets = [{'x': b['x'], 'y': b['y'] - 5} for b in bullets if b['y'] > 0]
+
+        # Update asteroid positions and check for collisions
         for asteroid in asteroids:
-            asteroid['y'] += asteroid['speed']
+            asteroid['y'] += asteroid_speed
             if asteroid['y'] > SCREEN_HEIGHT:
-                asteroid['y'] = -ASTEROID_HEIGHT
-                asteroid['x'] = random.randint(0, SCREEN_WIDTH - ASTEROID_WIDTH)
-                score += 1
-                if score % 5 == 0:
-                    level += 1
-                    asteroid['speed'] += 1
-
-        # Power-up movement
-        for powerup in powerups:
-            powerup['y'] += 3
-
-        # Collision detection between spaceship and asteroids
-        for asteroid in asteroids:
-            if (
-                spaceship_y < asteroid['y'] + ASTEROID_HEIGHT and
-                spaceship_y + SPACESHIP_HEIGHT > asteroid['y'] and
-                spaceship_x < asteroid['x'] + ASTEROID_WIDTH and
-                spaceship_x + SPACESHIP_WIDTH > asteroid['x']
-            ):
-                if not shield_active:
-                    lives -= 1
-                asteroid['y'] = -ASTEROID_HEIGHT
-                asteroid['x'] = random.randint(0, SCREEN_WIDTH - ASTEROID_WIDTH)
+                asteroids.remove(asteroid)
+                score += 1  # Add score if asteroid goes off-screen
+            if spaceship_hits_asteroid(x, y, asteroid):
+                crash_sound.play()
+                asteroids.remove(asteroid)
+                lives -= 1
                 if lives == 0:
-                    game_over = True
+                    # Save high score if needed
+                    if score > high_score:
+                        save_high_score(score)
+                    # End the game if lives reach 0
+                    action = show_end_screen(score, high_score)
+                    if action == "replay":
+                        game_loop()  # Restart game
+                    else:
+                        pygame.quit()
+                        sys.exit()
 
-        # Collision detection between bullets and asteroids
+        # Check for bullet collisions with asteroids
         for bullet in bullets:
             for asteroid in asteroids:
-                if (
-                    bullet['y'] < asteroid['y'] + ASTEROID_HEIGHT and
-                    bullet['y'] + BULLET_HEIGHT > asteroid['y'] and
-                    bullet['x'] < asteroid['x'] + ASTEROID_WIDTH and
-                    bullet['x'] + BULLET_WIDTH > asteroid['x']
-                ):
-                    asteroid['y'] = -ASTEROID_HEIGHT
-                    asteroid['x'] = random.randint(0, SCREEN_WIDTH - ASTEROID_WIDTH)
+                if bullet_hits_asteroid(bullet, asteroid):
+                    asteroid_hit_sound.play()
                     bullets.remove(bullet)
-                    score += 1
+                    asteroids.remove(asteroid)
+                    score += 10  # Add score for hitting an asteroid
                     break
 
-        # Collision detection between spaceship and power-ups
-        for powerup in powerups:
-            if (
-                spaceship_y < powerup['y'] + POWERUP_HEIGHT and
-                spaceship_y + SPACESHIP_HEIGHT > powerup['y'] and
-                spaceship_x < powerup['x'] + POWERUP_WIDTH and
-                spaceship_x + SPACESHIP_WIDTH > powerup['x']
-            ):
-                if powerup['type'] == POWERUP_LIFE:
-                    lives += 1
-                elif powerup['type'] == POWERUP_SPEED:
-                    extra_speed = 3  # Speed boost
-                    shield_duration = 300
-                elif powerup['type'] == POWERUP_POINTS:
-                    score += 10
-                powerups.remove(powerup)
+        # Level up every 50 points
+        if score // 50 > background_index:
+            background_index = min(len(background_images) - 1, background_index + 1)
+            asteroid_speed += 1  # Increase asteroid speed every level
 
-        # Check if player won
-        if score >= max_score_to_win:
-            player_won = True
-            game_over = True
+        # Drawing everything
+        screen.blit(spaceship_img, (x, y))
+        for asteroid in asteroids:
+            screen.blit(asteroid['img'], (asteroid['x'], asteroid['y']))
+        for bullet in bullets:
+            pygame.draw.rect(screen, WHITE, (bullet['x'], bullet['y'], BULLET_WIDTH, BULLET_HEIGHT))
 
-        # Update the background based on level
-        current_background = background_images[(level - 1) % len(background_images)]
-        screen.blit(current_background, (0, 0))
-
-        # Draw objects
-        draw_spaceship(spaceship_x, spaceship_y)
-        draw_asteroids(asteroids)
-        draw_bullets(bullets)
-        draw_powerups(powerups)
-
-        # Display score, level, and lives
         font = pygame.font.SysFont(None, 36)
-        score_text = font.render(f"Score: {score}", True, WHITE)
-        level_text = font.render(f"Level: {level}", True, WHITE)
-        screen.blit(score_text, (10, 10))
-        screen.blit(level_text, (SCREEN_WIDTH - 150, 10))
-        draw_lives(lives)
+        lives_text = font.render(f"Lives: {lives}", True, WHITE)
+        screen.blit(lives_text, (10, 10))
 
-        pygame.display.flip()
+        score_text = font.render(f"Score: {score}", True, WHITE)
+        screen.blit(score_text, (SCREEN_WIDTH - 150, 10))
+
+        pygame.display.update()
         clock.tick(60)
 
-    # High score update
-    if score > high_score:
-        high_score = score
-        save_high_score(high_score)
+# Show welcome screen at start
+show_welcome_screen()
 
-    if player_won:
-        show_end_screen(high_score)
-    else:
-        show_game_over_screen(score, high_score)
-
-    pygame.quit()
-
-# Start the game
-if __name__ == "__main__":
-    game_loop()
+# Start the game loop
+game_loop()
