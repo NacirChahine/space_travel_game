@@ -13,8 +13,12 @@ SCREEN_WIDTH, SCREEN_HEIGHT = 800, 600
 SPACESHIP_WIDTH, SPACESHIP_HEIGHT = 50, 50
 ASTEROID_WIDTH, ASTEROID_HEIGHT = 50, 50
 BULLET_WIDTH, BULLET_HEIGHT = 5, 10
+# Constants for colors
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
+YELLOW = (255, 255, 150)
+RED = (200, 0, 50)
+
 HIGHSCORE_FILE = 'highscore.dat'
 
 # Helper function to get the resource path (needed when bundled as a one-file .exe)
@@ -26,6 +30,24 @@ def resource_path(relative_path):
     except AttributeError:
         base_path = os.path.abspath(".")
     return os.path.join(base_path, relative_path)
+
+# Function to split text into multiple lines if it's too long
+def split_text(text, font, max_width):
+    """Splits the text into multiple lines based on the max width of the screen."""
+    words = text.split(' ')
+    lines = []
+    current_line = ""
+
+    for word in words:
+        test_line = current_line + word + " "
+        if font.size(test_line)[0] < max_width:  # Check if the line is within the screen width
+            current_line = test_line
+        else:
+            lines.append(current_line)
+            current_line = word + " "
+
+    lines.append(current_line)  # Add the last line
+    return lines
 
 # Load spaceship image
 spaceship_img = pygame.image.load(resource_path('space_ship.png'))
@@ -73,6 +95,26 @@ clock = pygame.time.Clock()
 
 # List of random space facts
 space_facts = [
+    "The Milky Way galaxy contains over 100 billion stars.",
+    "The Andromeda Galaxy is the closest large galaxy to ours.",
+    "The Hubble Space Telescope has been orbiting Earth since 1990.",
+    "The International Space Station is the size of a football field.",
+    "The Moon is slowly moving away from Earth.",
+    "Mars is often called the Red Planet.",
+    "Jupiter has the Great Red Spot, a giant storm that has been raging for centuries.",
+    "Saturn is known for its beautiful rings, made of ice and rock.",
+    "Pluto was reclassified as a dwarf planet in 2006.",
+    "The Voyager 1 spacecraft is the farthest human-made object from Earth.",
+    "Black holes are regions of space where gravity is so strong that nothing can escape.",
+    "Comets are made of ice, dust, and rock.",
+    "Asteroids are rocky objects in space.",
+    "The universe is billions of years old.",
+    "The Big Bang theory explains the origin of the universe.",
+    "There may be life on other planets in the universe.",
+    "Space suits protect astronauts from the harsh conditions of space.",
+    "The first artificial satellite was Sputnik 1, launched in 1957.",
+    "The Apollo 11 mission was the first to land humans on the Moon.",
+    "The International Space Station is a joint project of many countries.",
     "Space is completely silent.",
     "The hottest planet in our solar system is Venus.",
     "A full NASA space suit costs $12 million.",
@@ -81,6 +123,15 @@ space_facts = [
     "There are more stars in the universe than grains of sand on Earth.",
     "The Sun accounts for 99.86% of the mass in the Solar System.",
     "There could be 500 million planets capable of supporting life in our galaxy.",
+    "The Earth is a tiny speck in the vastness of space.",
+    "The Milky Way galaxy is about 100,000 light-years across.",
+    "Black holes are regions of space where gravity is so strong that nothing can escape.",
+    "The International Space Station orbits Earth at a speed of about 17,500 miles per hour.",
+    "The Apollo 11 mission was the first to land humans on the Moon.",
+    "The Sun is about 4.6 billion years old.",
+    "The Moon is about 4.5 billion years old.",
+    "The Sun's surface temperature is about 5,500 degrees Celsius.",
+    "The Sun's core temperature is about 15 million degrees Celsius."
 ]
 
 # Load high score from binary file
@@ -107,23 +158,38 @@ def draw_button(text, x, y, width, height, font_size=36):
 def show_welcome_screen():
     random_fact = random.choice(space_facts)
     fact_font = pygame.font.SysFont(None, 30)
+    wrapped_fact_lines = split_text(random_fact, fact_font, SCREEN_WIDTH - 40)  # Split long fact text into lines
     
+    blink = True  # To handle blinking of "Press Enter"
+    blink_timer = pygame.time.get_ticks()  # Start timer for blinking
+
     while True:
         screen.fill(BLACK)
-        screen.blit(logo_img, (SCREEN_WIDTH // 2 - logo_img.get_width() // 2, 100))
+        screen.blit(logo_img, (SCREEN_WIDTH // 2 - logo_img.get_width() // 3, 100))
 
-        font = pygame.font.SysFont(None, 55)
-        title_text = font.render("Welcome to the Spaceship Game!", True, WHITE)
+        # Display title text
+        font = pygame.font.SysFont(None, 50)
+        title_text = font.render("Welcome to Spaceship Game!", True, WHITE)
         screen.blit(title_text, (SCREEN_WIDTH // 2 - title_text.get_width() // 2, 50))
 
-        fact_text = fact_font.render(f"Did you know? {random_fact}", True, WHITE)
-        screen.blit(fact_text, (SCREEN_WIDTH // 2 - fact_text.get_width() // 2, 450))
+        # Display space fact
+        for i, line in enumerate(wrapped_fact_lines):
+            fact_text = fact_font.render(line, True, YELLOW)
+            screen.blit(fact_text, (SCREEN_WIDTH // 2 - fact_text.get_width() // 2, 450 + i * 30))
 
-        start_text = font.render("Press ENTER to Start", True, WHITE)
-        screen.blit(start_text, (SCREEN_WIDTH // 2 - start_text.get_width() // 2, 500))
+        # Blinking "Press Enter to Start" text
+        if blink:
+            start_text = font.render("Press ENTER to Start", True, RED)
+            screen.blit(start_text, (SCREEN_WIDTH // 2 - start_text.get_width() // 2, 500))
+
+        # Blink every 500ms (half second)
+        if pygame.time.get_ticks() - blink_timer > 500:
+            blink = not blink
+            blink_timer = pygame.time.get_ticks()
 
         pygame.display.update()
 
+        # Handle events
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
@@ -276,7 +342,8 @@ def game_loop():
         # Level up every 50 points
         if score // 50 > background_index:
             background_index = min(len(background_images) - 1, background_index + 1)
-            asteroid_speed += 1  # Increase asteroid speed every level
+            if asteroid_speed < 15:
+                asteroid_speed += 1  # Increase asteroid speed every level until it reaches max speed
 
         # Drawing everything
         screen.blit(spaceship_img, (x, y))
