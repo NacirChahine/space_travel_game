@@ -11,7 +11,7 @@ A simple 2D spaceship game built with Python and Pygame. The player controls a s
 - Use the **Left** and **Right Arrow Keys** to move the spaceship.
 - Use the **Space Key** to shoot asteroids.
 - Avoid getting hit by the asteroids.
-- Survive as long as you can and score higher than other players!
+- Survive as long as you can and score higher!
 
 ## Installation
 
@@ -24,9 +24,16 @@ A simple 2D spaceship game built with Python and Pygame. The player controls a s
    ```bash
     pip install -r requirements.txt
    ```
-3. Run the game:
+3. Copy .env.example to .env:
    ```bash
-    python spaceship_game.py
+    cp .env.example .env
+   ```
+4. Update the .env file:
+
+   Open the .env file and replace the placeholder MONGODB_URI with your real MongoDB connection URI.
+5. Run the game:
+   ```bash
+    python main.py
    ```
 ## Requirements
 - Python 3.x
