@@ -11,7 +11,7 @@ A simple 2D spaceship game built with Python and Pygame. The player controls a s
 - Use the **Left** and **Right Arrow Keys** to move the spaceship.
 - Use the **Space Key** to shoot asteroids.
 - Avoid getting hit by the asteroids.
-- Survive as long as you can and score higher!
+- Survive as long as you can and score higher than other players!
 
 ## Installation
 
@@ -22,7 +22,7 @@ A simple 2D spaceship game built with Python and Pygame. The player controls a s
    ```
 2. Install the required dependencies:
    ```bash
-    pip install pygame
+    pip install -r requirements.txt
    ```
 3. Run the game:
    ```bash
@@ -31,6 +31,8 @@ A simple 2D spaceship game built with Python and Pygame. The player controls a s
 ## Requirements
 - Python 3.x
 - Pygame
+- pymongo
+- python-dotenv
 
 ## Screenshots
 ![Screenshot 1](https://github.com/user-attachments/assets/ebfa4677-dc23-46ca-9d6d-ba52535eea75)
