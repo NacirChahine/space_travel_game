@@ -20,10 +20,14 @@ def game_loop(assets):
     asteroid_speed = 5
     background_index = 0
 
+    # Player starts with 5 bullets
+    available_bullets = 5
+
     asteroid_event = pygame.USEREVENT + 1
     pygame.time.set_timer(asteroid_event, 1000)
 
     while True:
+        # Render the current background
         screen.blit(assets['background_images'][background_index], (0, 0))
 
         # Handle events
@@ -31,15 +35,17 @@ def game_loop(assets):
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
+
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_LEFT:
                     left_key = True
                 if event.key == pygame.K_RIGHT:
                     right_key = True
-                if event.key == pygame.K_SPACE:
-                    # Fire bullet
+                if event.key == pygame.K_SPACE and available_bullets > 0:
+                    # Fire bullet if the player has bullets left
                     assets['fire_sound'].play()
                     bullets.append({'x': x + assets['SPACESHIP_WIDTH'] // 2 - assets['BULLET_WIDTH'] // 2, 'y': y})
+                    available_bullets -= 1  # Decrease bullet count when fired
 
             if event.type == pygame.KEYUP:
                 if event.key == pygame.K_LEFT:
@@ -55,7 +61,7 @@ def game_loop(assets):
                 })
 
         # Update spaceship movement based on key states
-        if right_key & left_key:
+        if right_key and left_key:
             x_change = 0  # No movement
         elif left_key:
             x_change = -5  # Move left
@@ -79,7 +85,8 @@ def game_loop(assets):
             asteroid['y'] += asteroid_speed
             if asteroid['y'] > assets['SCREEN_HEIGHT']:
                 asteroids.remove(asteroid)
-                score += 1
+                score += 1  # Increment score when asteroid passes
+
             if spaceship_hits_asteroid(x, y, asteroid):
                 assets['crash_sound'].play()
                 asteroids.remove(asteroid)
@@ -110,8 +117,15 @@ def game_loop(assets):
                     assets['asteroid_hit_sound'].play()
                     bullets.remove(bullet)
                     asteroids.remove(asteroid)
-                    score += 10
+                    score += 10  # Increment score for shooting an asteroid
+                    available_bullets += 1  # Add a bullet back to the player's inventory
                     break
+
+        # Level up and background/asteroid speed-up logic
+        if score // 50 > background_index:
+            background_index = min(len(assets['background_images']) - 1, background_index + 1)
+            if asteroid_speed < 15:  # Cap the asteroid speed at 15
+                asteroid_speed += 1  # Increase asteroid speed
 
         # Draw spaceship, asteroids, and bullets
         screen.blit(assets['spaceship_img'], (x, y))
@@ -120,12 +134,14 @@ def game_loop(assets):
         for asteroid in asteroids:
             screen.blit(asteroid['img'], (asteroid['x'], asteroid['y']))
 
-        # Display lives and score
+        # Display lives, score, and available bullets
         font = pygame.font.SysFont(None, 36)
         lives_text = font.render(f"Lives: {lives}", True, assets['WHITE'])
         screen.blit(lives_text, (10, 10))
         score_text = font.render(f"Score: {score}", True, assets['WHITE'])
         screen.blit(score_text, (assets['SCREEN_WIDTH'] - 150, 10))
+        bullets_text = font.render(f"Bullets: {available_bullets}", True, assets['WHITE'])
+        screen.blit(bullets_text, (assets['SCREEN_WIDTH'] // 2 - 50, 10))
 
         pygame.display.update()
         clock.tick(60)  # Limit the frame rate to 60 FPS
