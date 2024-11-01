@@ -21,6 +21,8 @@ def load_assets():
     assets['BLACK'] = (0, 0, 0)
     assets['YELLOW'] = (255, 255, 150)
     assets['RED'] = (200, 0, 50)
+    assets['GREEN'] = (0, 200, 50)
+    assets['BLUE'] = (50, 50, 200)
 
     # Load logo image
     assets['logo_img'] = pygame.image.load(resource_path('naro_chan_logo.png'))
@@ -57,6 +59,55 @@ def load_assets():
     pygame.mixer.music.play(-1)
 
     return assets
+
+
+def draw_health_bar(screen, lives, max_lives, assets):
+    bar_width = 20
+    bar_spacing = 5
+    x_offset = 10
+    y_offset = 10
+
+    for i in range(max_lives):
+        color = assets['RED'] if i < lives else assets['BLACK']
+        pygame.draw.rect(
+            screen,
+            color,
+            pygame.Rect(x_offset + i * (bar_width + bar_spacing), y_offset, bar_width, 15),
+            border_radius=5
+        )
+
+
+def draw_bullet_bar(screen, available_bullets, max_bullets, assets):
+    bar_width = 15
+    bar_spacing = 5
+    x_offset = 10
+    y_offset = 35
+
+    for i in range(max_bullets):
+        color = assets['BLUE'] if i < available_bullets else assets['BLACK']
+        pygame.draw.rect(
+            screen,
+            color,
+            pygame.Rect(x_offset + i * (bar_width + bar_spacing), y_offset, bar_width, 10),
+            border_radius=3
+        )
+
+
+def draw_score_display(screen, score, assets):
+    font = pygame.font.SysFont(None, 36)
+    shadow_color = (50, 50, 50)  # Dark color for shadow
+    score_text = font.render(f"Score: {score}", True, assets['WHITE'])
+    # score_shadow = font.render(f"Score: {score}", True, shadow_color)
+
+    # Rounded box background for score
+    # score_rect = pygame.Rect(assets['SCREEN_WIDTH'] - 160, 10, 150, 30)
+    # pygame.draw.rect(screen, assets['BLACK'], score_rect, border_radius=8)
+
+    # Draw shadow (slightly offset)
+    # screen.blit(score_shadow, (assets['SCREEN_WIDTH'] - 148, 17))  # Shadow offset by (2, 2)
+
+    # Draw main score text
+    screen.blit(score_text, (assets['SCREEN_WIDTH'] - 150, 15))
 
 
 def draw_button(screen, text, x, y, width, height, font_size=36, idle_color=(100, 100, 100),
