@@ -92,14 +92,15 @@ def game_loop(assets):
                 asteroids.remove(asteroid)
                 lives -= 1
                 if lives == 0:
-                    # Load the top 5 scores
+                    # Load the top 5 scores (returns empty list if database unavailable)
                     top_scores = load_top_scores()
 
                     # Check if the player's score qualifies for the top 5
                     if len(top_scores) < 5 or score > top_scores[-1]['high_score']:
                         # Prompt the player to enter initials if they qualify for the top 5
                         player_initials = get_player_initials(assets)
-                        save_high_score(score, player_initials)  # Save the new high score with initials
+                        # Try to save the high score (gracefully handles database failures)
+                        save_high_score(score, player_initials)
 
                     # Show the end screen with the high score and top 5
                     action = show_end_screen(score, assets)

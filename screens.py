@@ -155,7 +155,7 @@ def show_end_screen(score, assets):
     font = pygame.font.SysFont(None, 55)
     small_font = pygame.font.SysFont(None, 40)  # Smaller font for top 5 scores
 
-    # Load the top 5 scores from the database
+    # Load the top 5 scores from the database (returns empty list if unavailable)
     top_scores = load_top_scores()  # we get top updated scores
 
     while True:
@@ -176,13 +176,21 @@ def show_end_screen(score, assets):
         top_scores_title_x = assets['SCREEN_WIDTH'] // 2 - top_scores_title.get_width() // 2
         screen.blit(top_scores_title, (top_scores_title_x, 250))
 
-        # Iterate through the top 5 scores and display them
-        for i, entry in enumerate(top_scores):
-            initials = entry.get('initials', 'N/A')
-            high_score = entry.get('high_score', 0)
-            score_text = small_font.render(f"{i+1}. {initials} - {high_score}", True, assets['WHITE'])
-            score_text_x = assets['SCREEN_WIDTH'] // 2 - score_text.get_width() // 2
-            screen.blit(score_text, (score_text_x, 300 + i * 40))  # Space the scores vertically
+        # Check if scores are available
+        if len(top_scores) > 0:
+            # Iterate through the top 5 scores and display them
+            for i, entry in enumerate(top_scores):
+                initials = entry.get('initials', 'N/A')
+                high_score = entry.get('high_score', 0)
+                score_text = small_font.render(f"{i+1}. {initials} - {high_score}", True, assets['WHITE'])
+                score_text_x = assets['SCREEN_WIDTH'] // 2 - score_text.get_width() // 2
+                screen.blit(score_text, (score_text_x, 300 + i * 40))  # Space the scores vertically
+        else:
+            # Display message when database is unavailable
+            unavailable_font = pygame.font.SysFont(None, 35)
+            unavailable_text = unavailable_font.render("Leaderboard unavailable", True, assets['WHITE'])
+            unavailable_text_x = assets['SCREEN_WIDTH'] // 2 - unavailable_text.get_width() // 2
+            screen.blit(unavailable_text, (unavailable_text_x, 320))
 
         # Draw replay and exit buttons
         replay_button = draw_button(screen, "Replay", assets['SCREEN_WIDTH'] // 2 - 100, 520, 200, 50, font_size=40, idle_color=(80, 80, 200), hover_color=(100, 100, 250))
