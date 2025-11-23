@@ -6,8 +6,8 @@ import os
 GAME_VERSION = "3.0.0"
 
 # Screen settings
-SCREEN_WIDTH = 800
-SCREEN_HEIGHT = 600
+SCREEN_WIDTH = 1024
+SCREEN_HEIGHT = 576
 FPS = 60
 
 # Colors
@@ -34,6 +34,8 @@ PLAYER_LIVES = 3
 MAX_LIVES = 5
 INITIAL_BULLETS = 15
 MAX_BULLETS = 20
+INITIAL_MISSILES = 1
+MAX_MISSILES = 3
 ASTEROID_SPEED_INITIAL = 5
 ASTEROID_SPEED_MAX = 15
 POWERUP_SPEED = 3
@@ -50,7 +52,8 @@ ASTEROID_SPAWN_EVENT = 0  # Will be set in pygame setup
 POWERUP_SPAWN_EVENT = 0   # Will be set in pygame setup
 
 # Upgrades
-SPACESHIP_LEVEL_MAX = 3
+SPACESHIP_LEVEL_MAX = 5
+MISSILE_POWERUP_CHANCE = 0.1 # 10% chance when a powerup spawns
 UPGRADE_DURATION = 0 # Permanent until hit? Or temporary? Request implies permanent until hit.
 
 # Boss
@@ -88,3 +91,4 @@ BOSS_DIFFICULTY_TIERS = {
 GLASS_BG = (0, 0, 0, 128) # 50% transparent black
 GLASS_BORDER = (255, 255, 255, 100) # Semi-transparent white
 LEVEL_BAR_COLOR = (0, 255, 255) # Cyan for level
+MISSILE_COLOR = (255, 165, 0) # Orange for missiles

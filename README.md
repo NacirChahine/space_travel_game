@@ -5,8 +5,10 @@ A retro-style space shooter game built with Pygame.
 ## Features
 - **Spaceship Control**: Navigate your ship to avoid obstacles.
 - **Shooting**: Blast asteroids with your laser.
-- **Power-ups**: Collect health, ammo, and upgrade power-ups.
-- **Boss Battles**: Face multiple bosses simultaneously with varying difficulty levels.
+- **Spaceship Upgrades**: Level up your spaceship to unlock powerful bullet patterns (up to Level 5 with angled shots).
+- **Missile System**: Collect and fire missiles (Press 'M') to clear the screen of enemies.
+- **Power-ups**: Collect health, ammo, upgrades, and rare missiles.
+- **Boss Battles**: Face off against challenging bosses with unique attack patterns.
   - **Score-Based Spawning**: Bosses spawn at score milestones (200, 400, 600, 800, etc.)
   - **Visual Difficulty Indicators**: Bosses are color-coded (Green = Weak, Orange = Medium, Red = Strong)
   - **Dynamic Difficulty**: Boss strength scales with health and projectile count

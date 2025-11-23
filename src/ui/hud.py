@@ -33,20 +33,25 @@ class HUD:
             label_surf = self.font.render(label, True, WHITE)
             screen.blit(label_surf, (x + 10, y - 25))
 
-    def draw(self, screen, lives, max_lives, available_bullets, max_bullets, score, level):
-        # Health Bar
+    def draw(self, screen, lives, max_lives, available_bullets, max_bullets, score, level, missiles, max_missiles):
+        # Health Bar (Top Left)
         health_text = f"{lives}/{max_lives}"
-        self.draw_glass_bar(screen, 20, 40, 200, 30, lives / max_lives, RED, "Health", health_text)
+        self.draw_glass_bar(screen, 20, 20, 200, 30, lives / max_lives, RED, "Health", health_text)
         
-        # Ammo Bar
-        ammo_text = f"{available_bullets}/{max_bullets}"
-        self.draw_glass_bar(screen, 20, 100, 200, 30, available_bullets / max_bullets, BLUE, "Ammo", ammo_text)
-
-        # Level Bar
+        # Level Bar (Below Health)
         level_text = f"{level}/{SPACESHIP_LEVEL_MAX}"
-        self.draw_glass_bar(screen, 20, 160, 200, 30, level / SPACESHIP_LEVEL_MAX, LEVEL_BAR_COLOR, "Ship Level", level_text)
+        self.draw_glass_bar(screen, 20, 80, 200, 30, level / SPACESHIP_LEVEL_MAX, LEVEL_BAR_COLOR, "Ship Level", level_text)
 
-        # Score (Glass box)
+        # Ammo Bar (Bottom Left)
+        ammo_text = f"{available_bullets}/{max_bullets}"
+        self.draw_glass_bar(screen, 20, SCREEN_HEIGHT - 60, 200, 30, available_bullets / max_bullets, BLUE, "Ammo", ammo_text)
+
+        # Missile Display (Bottom Right)
+        # Unique visual design: Maybe distinct segments or just a bar with different color
+        missile_text = f"{missiles}/{max_missiles}"
+        self.draw_glass_bar(screen, SCREEN_WIDTH - 220, SCREEN_HEIGHT - 60, 200, 30, missiles / max_missiles, MISSILE_COLOR, "Missiles (M)", missile_text)
+
+        # Score (Top Right)
         score_text = f"Score: {score}"
         text_surf = self.font.render(score_text, True, WHITE)
         text_width = text_surf.get_width() + 40

@@ -30,7 +30,9 @@ class AssetManager:
         self.assets['spaceship_levels'] = {
             1: GraphicsGenerator.draw_spaceship(SPACESHIP_WIDTH, SPACESHIP_HEIGHT, 1),
             2: GraphicsGenerator.draw_spaceship(SPACESHIP_WIDTH, SPACESHIP_HEIGHT, 2),
-            3: GraphicsGenerator.draw_spaceship(SPACESHIP_WIDTH, SPACESHIP_HEIGHT, 3)
+            3: GraphicsGenerator.draw_spaceship(SPACESHIP_WIDTH, SPACESHIP_HEIGHT, 3),
+            4: GraphicsGenerator.draw_spaceship(SPACESHIP_WIDTH, SPACESHIP_HEIGHT, 3), # Reuse level 3 for now
+            5: GraphicsGenerator.draw_spaceship(SPACESHIP_WIDTH, SPACESHIP_HEIGHT, 3)  # Reuse level 3 for now
         }
         self.assets['spaceship_img'] = self.assets['spaceship_levels'][1] # Default
 
@@ -50,8 +52,13 @@ class AssetManager:
         self.assets['bullet_levels'] = {
             1: GraphicsGenerator.draw_bullet(BULLET_WIDTH, BULLET_HEIGHT, 1),
             2: GraphicsGenerator.draw_bullet(BULLET_WIDTH, BULLET_HEIGHT, 2),
-            3: GraphicsGenerator.draw_bullet(BULLET_WIDTH, BULLET_HEIGHT, 3)
+            3: GraphicsGenerator.draw_bullet(BULLET_WIDTH, BULLET_HEIGHT, 3),
+            4: GraphicsGenerator.draw_bullet(BULLET_WIDTH, BULLET_HEIGHT, 3),
+            5: GraphicsGenerator.draw_bullet(BULLET_WIDTH, BULLET_HEIGHT, 3)
         }
+
+        # Generate Missile
+        self.assets['missile_img'] = GraphicsGenerator.draw_missile(20, 40)
 
         # Generate Boss
         self.assets['boss_img'] = GraphicsGenerator.draw_boss(BOSS_WIDTH, BOSS_HEIGHT)
@@ -93,6 +100,15 @@ class AssetManager:
         pygame.draw.rect(ammo_pu_surf, YELLOW, (10, 8, 10, 14))
         pygame.draw.polygon(ammo_pu_surf, YELLOW, [(10, 8), (20, 8), (15, 2)])
         self.assets['ammo_powerup_img'] = ammo_pu_surf
+
+        # Missile Power-up (Blue Orb with 'M')
+        missile_pu_surf = pygame.Surface((POWERUP_WIDTH, POWERUP_HEIGHT), pygame.SRCALPHA)
+        pygame.draw.circle(missile_pu_surf, (50, 50, 100), (POWERUP_WIDTH // 2, POWERUP_HEIGHT // 2), POWERUP_WIDTH // 2)
+        # Draw 'M'
+        font_pu = pygame.font.SysFont(None, 24)
+        m_surf = font_pu.render("M", True, (255, 165, 0))
+        missile_pu_surf.blit(m_surf, (POWERUP_WIDTH // 2 - m_surf.get_width()//2, POWERUP_HEIGHT // 2 - m_surf.get_height()//2))
+        self.assets['missile_powerup_img'] = missile_pu_surf
 
         # Upgrade Power-up (Blue Up Arrow)
         upgrade_pu_surf = pygame.Surface((POWERUP_WIDTH, POWERUP_HEIGHT), pygame.SRCALPHA)

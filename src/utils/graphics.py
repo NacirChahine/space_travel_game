@@ -164,3 +164,24 @@ class GraphicsGenerator:
         color = (brightness, brightness, brightness)
         pygame.draw.circle(surface, color, (size // 2, size // 2), size // 2)
         return surface
+
+    @staticmethod
+    def draw_missile(width, height):
+        surface = pygame.Surface((width, height), pygame.SRCALPHA)
+        
+        # Missile Body
+        body_color = (255, 165, 0) # Orange
+        fin_color = (200, 50, 50) # Red
+        
+        center_x = width // 2
+        
+        # Body (Ellipse)
+        pygame.draw.ellipse(surface, body_color, (center_x - 5, 0, 10, height - 10))
+        
+        # Fins
+        # Left Fin
+        pygame.draw.polygon(surface, fin_color, [(center_x - 5, height - 15), (0, height), (center_x - 5, height - 5)])
+        # Right Fin
+        pygame.draw.polygon(surface, fin_color, [(center_x + 5, height - 15), (width, height), (center_x + 5, height - 5)])
+        
+        return surface

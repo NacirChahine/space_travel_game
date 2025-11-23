@@ -9,15 +9,9 @@ class Spaceship(Entity):
         self.fire_sound = sound
         self.bullets = pygame.sprite.Group()
         self.available_bullets = INITIAL_BULLETS
+        self.missiles = INITIAL_MISSILES
         self.level = 1
-        self.asset_manager = None # Will be set by GameScene or passed in init if refactored. 
-        # Actually, better to pass assets dict or manager. 
-        # Current init takes 'image' and 'sound'. 
-        # I'll need access to other level images.
-        # Let's assume we can pass the assets dictionary or handle image updates from outside?
-        # Or better, pass the assets dictionary to __init__ instead of single image.
-        # But to avoid breaking existing calls too much, I'll add a set_assets method or just update image from outside.
-        # Wait, GameScene creates Spaceship. I can pass assets there.
+        self.asset_manager = None 
         
     def set_assets(self, assets):
         self.assets = assets
@@ -25,7 +19,14 @@ class Spaceship(Entity):
 
     def update_image(self):
         if hasattr(self, 'assets'):
-            self.image = self.assets['spaceship_levels'][self.level]
+            # Ensure level doesn't exceed available images if they aren't defined for 4/5 yet
+            # Assuming assets['spaceship_levels'] has enough images or we reuse max level image
+            # For now, let's clamp the index to the max available in assets if needed, 
+            # but ideally assets should be updated. 
+            # If assets only has 3 levels, we reuse level 3 image for 4 and 5.
+            lvl_idx = min(self.level, len(self.assets['spaceship_levels']))
+            self.image = self.assets['spaceship_levels'][lvl_idx]
+            
             # Update rect but keep center
             center = self.rect.center
             self.rect = self.image.get_rect()
@@ -49,31 +50,45 @@ class Spaceship(Entity):
             self.fire_sound.play()
             
             # Determine bullet image based on level
-            b_img = self.assets['bullet_levels'][self.level] if hasattr(self, 'assets') else bullet_image
+            # Reuse level 3 bullet image for higher levels if needed
+            b_lvl_idx = min(self.level, len(self.assets['bullet_levels']))
+            b_img = self.assets['bullet_levels'][b_lvl_idx] if hasattr(self, 'assets') else bullet_image
             
             bullets = []
             
+            # Base positions
+            cx = self.rect.centerx
+            y = self.rect.y
+            
+            # Velocity constants
+            SPEED = 10
+            # 30 degrees: vx approx +/- 5, vy approx -8.5
+            VX_30 = 5
+            VY_30 = -8.5
+            # 15 degrees: vx approx +/- 2.5, vy approx -9.6
+            VX_15 = 2.5
+            VY_15 = -9.6
+            
+            # Standard Upward Shot (Levels 1-3 base)
             if self.level == 1:
-                # Single shot
-                bx = self.rect.centerx - BULLET_WIDTH // 2
-                by = self.rect.y
-                bullets.append((bx, by, b_img))
+                bullets.append((cx - BULLET_WIDTH // 2, y, 0, -SPEED, b_img))
             elif self.level == 2:
-                # Double shot
-                bx1 = self.rect.centerx - 10 - BULLET_WIDTH // 2
-                bx2 = self.rect.centerx + 10 - BULLET_WIDTH // 2
-                by = self.rect.y
-                bullets.append((bx1, by, b_img))
-                bullets.append((bx2, by, b_img))
-            elif self.level == 3:
-                # Triple shot
-                bx1 = self.rect.centerx - 15 - BULLET_WIDTH // 2
-                bx2 = self.rect.centerx + 15 - BULLET_WIDTH // 2
-                bx3 = self.rect.centerx - BULLET_WIDTH // 2
-                by = self.rect.y
-                bullets.append((bx1, by, b_img))
-                bullets.append((bx2, by, b_img))
-                bullets.append((bx3, by - 5, b_img)) # Center one slightly forward
+                bullets.append((cx - 10 - BULLET_WIDTH // 2, y, 0, -SPEED, b_img))
+                bullets.append((cx + 10 - BULLET_WIDTH // 2, y, 0, -SPEED, b_img))
+            elif self.level >= 3:
+                bullets.append((cx - 15 - BULLET_WIDTH // 2, y, 0, -SPEED, b_img))
+                bullets.append((cx + 15 - BULLET_WIDTH // 2, y, 0, -SPEED, b_img))
+                bullets.append((cx - BULLET_WIDTH // 2, y - 5, 0, -SPEED, b_img))
+
+            # Level 4: Add +/- 30 degrees
+            if self.level >= 4:
+                bullets.append((cx - BULLET_WIDTH // 2, y, -VX_30, VY_30, b_img))
+                bullets.append((cx - BULLET_WIDTH // 2, y, VX_30, VY_30, b_img))
+
+            # Level 5: Add +/- 15 degrees (or another pair)
+            if self.level >= 5:
+                bullets.append((cx - BULLET_WIDTH // 2, y, -VX_15, VY_15, b_img))
+                bullets.append((cx - BULLET_WIDTH // 2, y, VX_15, VY_15, b_img))
 
             return bullets
         return []
@@ -93,3 +108,12 @@ class Spaceship(Entity):
 
     def decrease_bullets(self):
         self.available_bullets -= 1
+        
+    def add_missiles(self, amount):
+        self.missiles = min(MAX_MISSILES, self.missiles + amount)
+        
+    def fire_missile(self):
+        if self.missiles > 0:
+            self.missiles -= 1
+            return True
+        return False

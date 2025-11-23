@@ -7,6 +7,7 @@ from src.entities.asteroid import Asteroid
 from src.entities.bullet import Bullet
 from src.entities.powerup import PowerUp
 from src.entities.boss import Boss
+from src.entities.missile import Missile
 from src.ui.hud import HUD
 from src.core.background import Background
 from src.config import *
@@ -42,6 +43,7 @@ class GameScene(Scene):
         self.bullets = pygame.sprite.Group()
         self.powerups = pygame.sprite.Group()
         self.bosses = pygame.sprite.Group()
+        self.missiles_group = pygame.sprite.Group()
         self.enemy_projectiles = pygame.sprite.Group()
         self.all_sprites = pygame.sprite.Group()
         self.all_sprites.add(self.spaceship)
@@ -60,12 +62,21 @@ class GameScene(Scene):
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_p:
                     self.toggle_pause()
+                
+                if event.key == pygame.K_m and not self.paused:
+                    if self.spaceship.fire_missile():
+                        # Spawn Missile
+                        missile = Missile(self.spaceship.rect.centerx, self.spaceship.rect.y, self.assets['missile_img'])
+                        self.missiles_group.add(missile)
+                        self.all_sprites.add(missile)
+                        self.assets['fire_sound'].play() # Launch sound
+
 
                 if not self.paused:
                     if event.key == pygame.K_SPACE:
                         new_bullets = self.spaceship.shoot(self.assets['bullet_img'])
-                        for bx, by, img in new_bullets:
-                            bullet = Bullet(bx, by, img)
+                        for bx, by, vx, vy, img in new_bullets:
+                            bullet = Bullet(bx, by, img, vx, vy)
                             self.bullets.add(bullet)
                             self.all_sprites.add(bullet)
                         if new_bullets:
@@ -89,13 +100,19 @@ class GameScene(Scene):
             
         # Spawn Powerups
         if current_time - self.powerup_timer > 5000:
-            type = random.choice(['health', 'ammo', 'upgrade'])
-            if type == 'health':
-                img = self.assets['health_powerup_img']
-            elif type == 'ammo':
-                img = self.assets['ammo_powerup_img']
+            # Determine type
+            roll = random.random()
+            if roll < MISSILE_POWERUP_CHANCE:
+                type = 'missile'
+                img = self.assets['missile_powerup_img'] if 'missile_powerup_img' in self.assets else self.assets['upgrade_powerup_img'] # Fallback if image missing
             else:
-                img = self.assets['upgrade_powerup_img']
+                type = random.choice(['health', 'ammo', 'upgrade'])
+                if type == 'health':
+                    img = self.assets['health_powerup_img']
+                elif type == 'ammo':
+                    img = self.assets['ammo_powerup_img']
+                else:
+                    img = self.assets['upgrade_powerup_img']
                 
             powerup = PowerUp(img, type)
             self.powerups.add(powerup)
@@ -146,7 +163,24 @@ class GameScene(Scene):
         self.asteroids.update()
         self.powerups.update()
         self.bosses.update()
+        self.missiles_group.update()
         self.enemy_projectiles.update()
+
+        # Check for missile explosions
+        for missile in self.missiles_group:
+            if missile.exploded:
+                # Clear all enemies
+                for asteroid in self.asteroids:
+                    asteroid.kill()
+                    self.score += 10
+                for boss in self.bosses:
+                    boss.kill()
+                    self.score += 100
+                for projectile in self.enemy_projectiles:
+                    projectile.kill()
+                
+                self.assets['end_bomb_sound'].play()
+                missile.kill()
         
         # Add new projectiles from bosses to groups
         for boss in self.bosses:
@@ -215,6 +249,8 @@ class GameScene(Scene):
                 self.spaceship.add_bullets(AMMO_POWERUP_BULLETS)
             elif hit.type == 'upgrade':
                 self.spaceship.upgrade()
+            elif hit.type == 'missile':
+                self.spaceship.add_missiles(1)
 
         # Level Up / Difficulty Progression
         new_level = (self.score // LEVEL_SCORE_THRESHOLD) + 1
@@ -238,7 +274,7 @@ class GameScene(Scene):
         self.all_sprites.draw(screen)
         
         # HUD
-        self.hud.draw(screen, self.lives, MAX_LIVES, self.spaceship.available_bullets, MAX_BULLETS, self.score, self.spaceship.level)
+        self.hud.draw(screen, self.lives, MAX_LIVES, self.spaceship.available_bullets, MAX_BULLETS, self.score, self.spaceship.level, self.spaceship.missiles, MAX_MISSILES)
 
         if self.paused:
             self.draw_pause_screen(screen)

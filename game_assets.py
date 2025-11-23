@@ -79,6 +79,41 @@ def load_assets():
     assets['POWERUP_WIDTH'] = 30
     assets['POWERUP_HEIGHT'] = 30
 
+    # Missile Asset
+    missile_surf = pygame.Surface((20, 40), pygame.SRCALPHA)
+    pygame.draw.ellipse(missile_surf, (255, 165, 0), (5, 0, 10, 30)) # Body
+    pygame.draw.polygon(missile_surf, (200, 50, 50), [(5, 20), (0, 35), (5, 30)]) # Left Fin
+    pygame.draw.polygon(missile_surf, (200, 50, 50), [(15, 20), (20, 35), (15, 30)]) # Right Fin
+    assets['missile_img'] = missile_surf
+
+    # Missile Powerup
+    missile_pu_surf = pygame.Surface((30, 30), pygame.SRCALPHA)
+    pygame.draw.circle(missile_pu_surf, (50, 50, 100), (15, 15), 15)
+    # Draw 'M'
+    font_pu = pygame.font.SysFont(None, 24)
+    m_surf = font_pu.render("M", True, (255, 165, 0))
+    missile_pu_surf.blit(m_surf, (15 - m_surf.get_width()//2, 15 - m_surf.get_height()//2))
+    assets['missile_powerup_img'] = missile_pu_surf
+
+    # Upgrade Powerup (Green Up Arrow)
+    upgrade_pu_surf = pygame.Surface((30, 30), pygame.SRCALPHA)
+    pygame.draw.circle(upgrade_pu_surf, (50, 200, 50), (15, 15), 15)
+    pygame.draw.polygon(upgrade_pu_surf, (255, 255, 255), [(15, 5), (5, 20), (25, 20)])
+    assets['upgrade_powerup_img'] = upgrade_pu_surf
+
+    # Bullet Levels
+    assets['bullet_levels'] = []
+    colors = [(255, 255, 255), (255, 255, 200), (255, 200, 100), (255, 100, 100), (255, 50, 255)]
+    for i in range(5):
+        surf = pygame.Surface((5 + i, 10 + i*2), pygame.SRCALPHA)
+        pygame.draw.rect(surf, colors[i], (0, 0, 5 + i, 10 + i*2), border_radius=2)
+        assets['bullet_levels'].append(surf)
+    # Add one more for safety if index is 5 (1-based level)
+    assets['bullet_levels'].append(assets['bullet_levels'][-1])
+
+    # Spaceship Levels (Reuse image but maybe add glow or something? For now just reuse)
+    assets['spaceship_levels'] = [assets['spaceship_img']] * 6 # 0-5
+
     return assets
 
 
