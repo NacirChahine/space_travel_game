@@ -29,6 +29,11 @@ def game_loop(assets):
     asteroid_event = pygame.USEREVENT + 1
     pygame.time.set_timer(asteroid_event, 1000)
 
+    powerup_event = pygame.USEREVENT + 2
+    pygame.time.set_timer(powerup_event, 5000)  # Spawn power-up every 5 seconds
+
+    powerups = []
+
     while True:
         # Render the current background
         screen.blit(assets['background_images'][background_index], (0, 0))
@@ -61,6 +66,16 @@ def game_loop(assets):
                     'x': random.randint(0, assets['SCREEN_WIDTH'] - assets['ASTEROID_WIDTH']),
                     'y': 0,
                     'img': random.choice(assets['asteroid_images'])
+                })
+
+            if event.type == powerup_event:
+                powerup_type = random.choice(['health', 'ammo'])
+                img = assets['health_powerup_img'] if powerup_type == 'health' else assets['ammo_powerup_img']
+                powerups.append({
+                    'x': random.randint(0, assets['SCREEN_WIDTH'] - assets['POWERUP_WIDTH']),
+                    'y': -assets['POWERUP_HEIGHT'],
+                    'type': powerup_type,
+                    'img': img
                 })
 
         # Update spaceship movement based on key states
@@ -122,6 +137,21 @@ def game_loop(assets):
                     available_bullets += 1  # Add a bullet back to the player's inventory
                     break
 
+        # Power-up movement and collision
+        for powerup in powerups[:]:
+            powerup['y'] += 3  # Power-ups move slower than asteroids
+            if powerup['y'] > assets['SCREEN_HEIGHT']:
+                powerups.remove(powerup)
+            
+            elif spaceship_hits_powerup(x, y, powerup, assets):
+                if powerup['type'] == 'health':
+                    if lives < max_lives:
+                        lives += 1
+                elif powerup['type'] == 'ammo':
+                    if available_bullets < max_bullets:
+                        available_bullets = min(max_bullets, available_bullets + 3)
+                powerups.remove(powerup)
+
         # Level up and background/asteroid speed-up logic
         if score // 50 > background_index:
             background_index = min(len(assets['background_images']) - 1, background_index + 1)
@@ -133,6 +163,8 @@ def game_loop(assets):
             pygame.draw.rect(screen, assets['WHITE'], (bullet['x'], bullet['y'], assets['BULLET_WIDTH'], assets['BULLET_HEIGHT']))
         for asteroid in asteroids:
             screen.blit(asteroid['img'], (asteroid['x'], asteroid['y']))
+        for powerup in powerups:
+            screen.blit(powerup['img'], (powerup['x'], powerup['y']))
 
         # Display custom health, bullet bars, and score display
         draw_health_bar(screen, lives, max_lives, assets)
@@ -154,3 +186,9 @@ def bullet_hits_asteroid(bullet, asteroid):
     bullet_rect = pygame.Rect(bullet['x'], bullet['y'], 5, 10)
     asteroid_rect = pygame.Rect(asteroid['x'], asteroid['y'], 50, 50)
     return bullet_rect.colliderect(asteroid_rect)
+
+
+def spaceship_hits_powerup(x, y, powerup, assets):
+    spaceship_rect = pygame.Rect(x, y, assets['SPACESHIP_WIDTH'], assets['SPACESHIP_HEIGHT'])
+    powerup_rect = pygame.Rect(powerup['x'], powerup['y'], assets['POWERUP_WIDTH'], assets['POWERUP_HEIGHT'])
+    return spaceship_rect.colliderect(powerup_rect)

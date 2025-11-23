@@ -58,6 +58,27 @@ def load_assets():
     pygame.mixer.music.load(resource_path('drive-breakbeat.mp3'))
     pygame.mixer.music.play(-1)
 
+    # Create Power-up Assets
+    # Health Power-up (Red Cross)
+    health_pu_size = 30
+    health_pu_surf = pygame.Surface((health_pu_size, health_pu_size), pygame.SRCALPHA)
+    pygame.draw.circle(health_pu_surf, (255, 255, 255), (health_pu_size // 2, health_pu_size // 2), health_pu_size // 2)
+    pygame.draw.rect(health_pu_surf, assets['RED'], (health_pu_size // 2 - 4, 5, 8, 20))
+    pygame.draw.rect(health_pu_surf, assets['RED'], (5, health_pu_size // 2 - 4, 20, 8))
+    assets['health_powerup_img'] = health_pu_surf
+
+    # Ammo Power-up (Yellow Bullet Icon)
+    ammo_pu_size = 30
+    ammo_pu_surf = pygame.Surface((ammo_pu_size, ammo_pu_size), pygame.SRCALPHA)
+    pygame.draw.circle(ammo_pu_surf, (50, 50, 50), (ammo_pu_size // 2, ammo_pu_size // 2), ammo_pu_size // 2)
+    # Draw simplified bullet shape
+    pygame.draw.rect(ammo_pu_surf, assets['YELLOW'], (10, 8, 10, 14))
+    pygame.draw.polygon(ammo_pu_surf, assets['YELLOW'], [(10, 8), (20, 8), (15, 2)])
+    assets['ammo_powerup_img'] = ammo_pu_surf
+
+    assets['POWERUP_WIDTH'] = 30
+    assets['POWERUP_HEIGHT'] = 30
+
     return assets
 
 
