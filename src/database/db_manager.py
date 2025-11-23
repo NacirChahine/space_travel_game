@@ -4,6 +4,7 @@ from pymongo.errors import ConnectionFailure, ServerSelectionTimeoutError, PyMon
 from dotenv import load_dotenv
 from datetime import datetime
 import logging
+from src.config import GAME_VERSION
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -56,12 +57,30 @@ class DBManager:
         self._db = None
         self._scores_collection = None
 
-    def load_top_scores(self):
+    def load_top_scores(self, version=None):
+        """
+        Load top 5 scores for a specific game version.
+
+        Args:
+            version: Game version to filter by. If None, uses current GAME_VERSION.
+
+        Returns:
+            List of top 5 score documents for the specified version.
+        """
         try:
             collection = self.get_connection()
             if collection is None:
                 return []
-            return list(collection.find({}, sort=[("high_score", -1)]).limit(5))
+
+            # Use current version if not specified
+            if version is None:
+                version = GAME_VERSION
+
+            # Filter scores by version and get top 5
+            query = {"version": version}
+            top_scores = list(collection.find(query, sort=[("high_score", -1)]).limit(5))
+            logger.info(f"Successfully loaded {len(top_scores)} top scores for version {version}")
+            return top_scores
         except PyMongoError as e:
             logger.error(f"Error loading top scores: {e}")
             self._reset_connection()
@@ -70,20 +89,39 @@ class DBManager:
             logger.error(f"Unexpected error loading top scores: {e}")
             return []
 
-    def save_high_score(self, score, initials):
+    def save_high_score(self, score, initials, version=None):
+        """
+        Save a high score for a specific game version.
+
+        Args:
+            score: The player's score
+            initials: The player's initials (3 letters)
+            version: Game version to save under. If None, uses current GAME_VERSION.
+
+        Returns:
+            True if score was saved successfully, False otherwise.
+        """
         try:
             collection = self.get_connection()
             if collection is None:
                 return False
-            
-            top_scores = self.load_top_scores()
+
+            # Use current version if not specified
+            if version is None:
+                version = GAME_VERSION
+
+            # Load top scores for this version only
+            top_scores = self.load_top_scores(version)
+
+            # Check if score qualifies for top 5 in this version
             if len(top_scores) < 5 or score > top_scores[-1]['high_score']:
                 collection.insert_one({
                     "high_score": score,
                     "initials": initials,
+                    "version": version,
                     "scored_at": datetime.utcnow()
                 })
-                logger.info(f"Successfully saved high score: {initials} - {score}")
+                logger.info(f"Successfully saved high score: {initials} - {score} (version {version})")
                 return True
             return False
         except PyMongoError as e:
