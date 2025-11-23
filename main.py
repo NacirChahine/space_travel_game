@@ -1,36 +1,10 @@
-import pygame
-from game_assets import load_assets
-from screens import show_welcome_screen
-from game_logic import game_loop
-from utils import resource_path
-from database import close_database_connection
+import sys
+import os
 
-# Initialize Pygame and assets
-pygame.init()
-pygame.mixer.init()
+# Add the current directory to sys.path to make src module importable
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
-# Set the window title
-pygame.display.set_caption("Space Travel | Naro Chan Dev")
-
-# Load and set the window icon
-icon = pygame.image.load(resource_path('space_ship.png'))
-pygame.display.set_icon(icon)
-
-
-def main():
-    try:
-        # Load all assets
-        assets = load_assets()
-
-        # Show welcome screen
-        show_welcome_screen(assets)
-
-        # Start the game loop
-        game_loop(assets)
-    finally:
-        # Ensure database connection is closed when the game exits
-        close_database_connection()
-
+from src.main import main
 
 if __name__ == "__main__":
     main()

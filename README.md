@@ -1,45 +1,46 @@
-# Spaceship Game 🚀
+# Space Travel Game
 
-A simple 2D spaceship game built with Python and Pygame. The player controls a spaceship to avoid falling asteroids, progressing through increasingly challenging levels. Each level increases the speed and number of asteroids.
+A retro-style space shooter game built with Pygame.
 
 ## Features
-- Multiple Asteroids: As the player progresses, the number of asteroids increases, adding to the challenge.
-- Weapon System: Allow the player to shoot bullets at the asteroids.
-- Lives System: The player starts with 3 lives. Colliding with an asteroid reduces lives. The game ends when all lives are lost.
-
-## How to Play
-- Use the **Left** and **Right Arrow Keys** to move the spaceship.
-- Use the **Space Key** to shoot asteroids.
-- Avoid getting hit by the asteroids.
-- Survive as long as you can and score higher!
+- **Spaceship Control**: Navigate your ship to avoid obstacles.
+- **Shooting**: Blast asteroids with your laser.
+- **Power-ups**: Collect health and ammo power-ups.
+- **High Scores**: Compete for the top spot on the leaderboard (MongoDB).
+- **Dynamic Difficulty**: Game gets harder as you progress.
 
 ## Installation
 
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/NacirChahine/spaceship-game.git
-   cd spaceship-game
-   ```
-2. Install the required dependencies:
-   ```bash
+1.  Clone the repository.
+2.  Install dependencies:
+    ```bash
     pip install -r requirements.txt
-   ```
-3. Copy .env.example to .env:
-   ```bash
-    cp .env.example .env
-   ```
-4. Update the .env file:
+    ```
+3.  Set up environment variables:
+    - Create a `.env` file based on `.env.example`.
+    - Add your `MONGODB_URI`.
 
-   Open the .env file and replace the placeholder MONGODB_URI with your real MongoDB connection URI.
-5. Run the game:
-   ```bash
-    python main.py
-   ```
-## Requirements
-- Python 3.x
-- Pygame
-- pymongo
-- python-dotenv
+## Running the Game
+
+Run the game using the main entry point:
+```bash
+python main.py
+```
+
+## Project Structure
+
+The project is organized into a modular structure:
+- `src/core`: Core game loop and state management.
+- `src/entities`: Game objects (Spaceship, Asteroid, etc.).
+- `src/scenes`: Game scenes (Welcome, Game, GameOver).
+- `src/ui`: UI components.
+- `src/utils`: Helper functions and asset management.
+- `src/database`: Database connection logic.
+
+## Controls
+- **Arrow Keys**: Move spaceship.
+- **Space**: Shoot.
+- **Enter**: Start game / Submit initials.
 
 ## Screenshots
 ![Screenshot 1](https://github.com/user-attachments/assets/ebfa4677-dc23-46ca-9d6d-ba52535eea75)
