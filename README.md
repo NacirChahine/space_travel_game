@@ -10,6 +10,7 @@ A retro-style space shooter game built with Pygame.
   - **Score-Based Spawning**: Bosses spawn at score milestones (200, 400, 600, 800, etc.)
   - **Visual Difficulty Indicators**: Bosses are color-coded (Green = Weak, Orange = Medium, Red = Strong)
   - **Dynamic Difficulty**: Boss strength scales with health and projectile count
+- **HUD Display**: Real-time numeric displays centered inside progress bars showing health, ammo, and ship level values (e.g., "3/5", "12/20").
 - **High Scores**: Compete for the top spot on the leaderboard (MongoDB).
 - **Progressive Difficulty**: Game gets harder as you progress through levels.
 

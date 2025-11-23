@@ -33,6 +33,10 @@ The project follows a component-based architecture with a scene management syste
   - Multiple simultaneous boss battles
   - Pause functionality
   - Progressive difficulty scaling
+  - **HUD**: Glassmorphic UI with real-time numeric displays inside the progress bars:
+    - Health: current/max (e.g., "3/5") - centered inside health bar
+    - Ammo: current/max (e.g., "12/20") - centered inside ammo bar
+    - Ship Level: current/max (e.g., "2/3") - centered inside level bar
 - **GameOverScene**: End screen with high scores.
 
 ## Development
