@@ -40,6 +40,7 @@ The project is organized into a modular structure:
 ## Controls
 - **Arrow Keys**: Move spaceship.
 - **Space**: Shoot.
+- **P**: Pause/Unpause game.
 - **Enter**: Start game / Submit initials.
 
 ## Screenshots

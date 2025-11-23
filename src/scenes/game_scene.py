@@ -44,18 +44,30 @@ class GameScene(Scene):
         self.asteroid_timer = pygame.time.get_ticks()
         self.powerup_timer = pygame.time.get_ticks()
 
+        # Pause State
+        self.paused = False
+        self.pause_start_time = 0
+        self.font_pause_sub = pygame.font.Font(None, 36)
+
     def process_input(self, events):
         for event in events:
             if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_SPACE:
-                    bx, by = self.spaceship.shoot(None)
-                    if bx is not None:
-                        bullet = Bullet(bx, by, self.assets['bullet_img'])
-                        self.bullets.add(bullet)
-                        self.all_sprites.add(bullet)
-                        self.spaceship.decrease_bullets()
+                if event.key == pygame.K_p:
+                    self.toggle_pause()
+
+                if not self.paused:
+                    if event.key == pygame.K_SPACE:
+                        bx, by = self.spaceship.shoot(None)
+                        if bx is not None:
+                            bullet = Bullet(bx, by, self.assets['bullet_img'])
+                            self.bullets.add(bullet)
+                            self.all_sprites.add(bullet)
+                            self.spaceship.decrease_bullets()
 
     def update(self):
+        if self.paused:
+            return
+
         current_time = pygame.time.get_ticks()
         
         # Update Background
@@ -130,3 +142,37 @@ class GameScene(Scene):
         
         # HUD
         self.hud.draw(screen, self.lives, MAX_LIVES, self.spaceship.available_bullets, MAX_BULLETS, self.score)
+
+        if self.paused:
+            self.draw_pause_screen(screen)
+
+    def toggle_pause(self):
+        self.paused = not self.paused
+        if self.paused:
+            self.pause_start_time = pygame.time.get_ticks()
+            pygame.mixer.music.pause()
+        else:
+            pause_duration = pygame.time.get_ticks() - self.pause_start_time
+            self.asteroid_timer += pause_duration
+            self.powerup_timer += pause_duration
+            pygame.mixer.music.unpause()
+
+    def draw_pause_screen(self, screen):
+        # Overlay
+        overlay = pygame.Surface((SCREEN_WIDTH, SCREEN_HEIGHT), pygame.SRCALPHA)
+        overlay.fill((0, 0, 0, 128)) # Semi-transparent black
+        screen.blit(overlay, (0, 0))
+        
+        # Pause Icon (Two vertical bars)
+        center_x, center_y = SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2
+        bar_width = 20
+        bar_height = 60
+        gap = 20
+        
+        pygame.draw.rect(screen, WHITE, (center_x - gap//2 - bar_width, center_y - bar_height//2 - 20, bar_width, bar_height))
+        pygame.draw.rect(screen, WHITE, (center_x + gap//2, center_y - bar_height//2 - 20, bar_width, bar_height))
+        
+        # Text
+        text_surf = self.font_pause_sub.render("Press P to Unpause", True, WHITE)
+        text_rect = text_surf.get_rect(center=(center_x, center_y + 40))
+        screen.blit(text_surf, text_rect)

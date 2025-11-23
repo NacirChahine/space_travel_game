@@ -21,7 +21,7 @@ The project follows a component-based architecture with a scene management syste
 
 ### Scenes
 - **WelcomeScene**: Start screen.
-- **GameScene**: Main gameplay loop.
+- **GameScene**: Main gameplay loop (includes pause functionality).
 - **GameOverScene**: End screen with high scores.
 
 ## Development
