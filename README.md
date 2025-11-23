@@ -53,7 +53,7 @@ The project is organized into a modular structure:
 <img width="797" height="625" alt="space_travel_game_img_2" src="https://github.com/user-attachments/assets/dcfbd159-6a56-4b3e-bad5-99bfb15b6dc2" />
 
 ## Gameplay
-![space_travel_gameplay](https://github.com/user-attachments/assets/8e83ac07-235a-473c-bdcf-de8509f44491)
+![Recording 2025-11-23 231412](https://github.com/user-attachments/assets/aaf259ea-efcb-4a8d-a41a-e26cb8a555dc)
 
 
 Enjoy the game! 🚀
