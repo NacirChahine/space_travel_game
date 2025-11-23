@@ -1,4 +1,5 @@
 import os
+import sys
 from pymongo import MongoClient
 from pymongo.errors import ConnectionFailure, ServerSelectionTimeoutError, PyMongoError
 from dotenv import load_dotenv
@@ -10,7 +11,17 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 # Load environment variables
-load_dotenv()
+def get_env_path():
+    """Get the path to the .env file, handling PyInstaller's temp path."""
+    try:
+        # PyInstaller creates a temp folder and stores path in _MEIPASS
+        base_path = sys._MEIPASS
+    except AttributeError:
+        base_path = os.path.abspath(".")
+    
+    return os.path.join(base_path, ".env")
+
+load_dotenv(get_env_path())
 mongodb_uri = os.getenv("MONGODB_URI")
 
 # MongoDB client singleton

@@ -32,6 +32,33 @@ Run the game using the main entry point:
 python main.py
 ```
 
+## Building the Executable
+
+You can build a standalone executable using PyInstaller. First, ensure PyInstaller is installed:
+
+```bash
+pip install pyinstaller
+```
+
+### Windows
+
+```bash
+pyinstaller --clean --onefile --noconsole --icon="assets/space_travel.ico" --add-data "assets;assets" --add-data ".env;." main.py
+```
+
+### macOS / Linux
+
+Note: The path separator for `--add-data` is `:` on Unix-like systems.
+
+```bash
+pyinstaller --clean --onefile --noconsole --icon="assets/space_travel.ico" --add-data "assets:assets" --add-data ".env:." main.py
+```
+
+**Important Note on Database**:
+This game uses MongoDB. The executable bundles the connection string from your `.env` file.
+- If you use a **cloud database** (e.g., MongoDB Atlas), the executable will work on any machine with internet access.
+- If you use a **local database** (localhost), the executable will only work on machines that have a MongoDB server running locally.
+
 ## Project Structure
 
 The project is organized into a modular structure:
