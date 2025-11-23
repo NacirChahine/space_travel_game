@@ -14,14 +14,24 @@ The project follows a component-based architecture with a scene management syste
 
 ### Entities
 - **Entity**: Base class for all game objects.
-- **Spaceship**: Player character.
-- **Asteroid**: Obstacles.
-- **Bullet**: Projectiles.
-- **PowerUp**: Collectible items.
+- **Spaceship**: Player character with upgrade levels (1-3) and weapon systems.
+- **Asteroid**: Obstacles with varying sizes and speeds.
+- **Bullet**: Projectiles fired by the spaceship.
+- **PowerUp**: Collectible items (health, ammo, upgrade).
+- **Boss**: Enemy bosses with difficulty tiers and color-coded visual indicators.
+  - **Difficulty Tiers**: WEAK (green), MEDIUM (orange), STRONG (red)
+  - **Scaling Attributes**: Health (3-20 HP), Projectile Count (2-4)
+  - **Color Overlay**: Visual feedback indicating difficulty level
+- **EnemyProjectile**: Projectiles fired by bosses.
 
 ### Scenes
 - **WelcomeScene**: Start screen.
-- **GameScene**: Main gameplay loop (includes pause functionality).
+- **GameScene**: Main gameplay loop with:
+  - Dynamic asteroid spawning
+  - Power-up collection system
+  - Multiple simultaneous boss battles
+  - Pause functionality
+  - Progressive difficulty scaling
 - **GameOverScene**: End screen with high scores.
 
 ## Development

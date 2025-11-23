@@ -102,10 +102,40 @@ class GameScene(Scene):
             self.all_sprites.add(powerup)
             self.powerup_timer = current_time
 
-        # Spawn Boss
-        if len(self.bosses) == 0 and self.score >= self.next_boss_score:
-             # Spawn Boss
-             boss = Boss(SCREEN_WIDTH // 2, 50, self.assets['boss_img'], self.assets['enemy_projectile_img'], BOSS_HEALTH_INITIAL + self.level)
+        # Spawn Boss (Allow Multiple Bosses)
+        if self.score >= self.next_boss_score:
+             # Determine difficulty tier based on level/score
+             # Higher levels increase chance of stronger bosses
+             difficulty_roll = random.random()
+             
+             if self.level <= 2:
+                 # Early game: mostly weak bosses
+                 if difficulty_roll < 0.7:
+                     difficulty_tier = 'WEAK'
+                 elif difficulty_roll < 0.95:
+                     difficulty_tier = 'MEDIUM'
+                 else:
+                     difficulty_tier = 'STRONG'
+             elif self.level <= 5:
+                 # Mid game: mix of weak and medium, some strong
+                 if difficulty_roll < 0.4:
+                     difficulty_tier = 'WEAK'
+                 elif difficulty_roll < 0.85:
+                     difficulty_tier = 'MEDIUM'
+                 else:
+                     difficulty_tier = 'STRONG'
+             else:
+                 # Late game: mostly medium and strong
+                 if difficulty_roll < 0.2:
+                     difficulty_tier = 'WEAK'
+                 elif difficulty_roll < 0.6:
+                     difficulty_tier = 'MEDIUM'
+                 else:
+                     difficulty_tier = 'STRONG'
+             
+             # Spawn Boss with selected difficulty
+             boss = Boss(SCREEN_WIDTH // 2, 50, self.assets['boss_img'], 
+                        self.assets['enemy_projectile_img'], difficulty_tier)
              self.bosses.add(boss)
              self.all_sprites.add(boss)
              self.next_boss_score += BOSS_SPAWN_SCORE

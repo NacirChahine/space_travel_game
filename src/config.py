@@ -27,8 +27,8 @@ POWERUP_HEIGHT = 30
 # Game Settings
 PLAYER_LIVES = 3
 MAX_LIVES = 5
-INITIAL_BULLETS = 5
-MAX_BULLETS = 10
+INITIAL_BULLETS = 15
+MAX_BULLETS = 20
 ASTEROID_SPEED_INITIAL = 5
 ASTEROID_SPEED_MAX = 15
 POWERUP_SPEED = 3
@@ -53,6 +53,30 @@ BOSS_SPAWN_SCORE = 100 # Score to spawn first boss
 BOSS_WIDTH = 80
 BOSS_HEIGHT = 80
 BOSS_PROJECTILE_SPEED = 7
+
+# Boss Difficulty Tiers
+# Difficulty is determined by health and projectile count
+# Colors provide visual indicators for difficulty
+BOSS_DIFFICULTY_TIERS = {
+    'WEAK': {
+        'health_range': (3, 5),
+        'projectile_count': 2,
+        'color': (100, 200, 100),  # Green - Easy
+        'border_color': (150, 255, 150)
+    },
+    'MEDIUM': {
+        'health_range': (6, 10),
+        'projectile_count': 3,
+        'color': (200, 150, 50),  # Orange - Medium
+        'border_color': (255, 200, 100)
+    },
+    'STRONG': {
+        'health_range': (11, 20),
+        'projectile_count': 4,
+        'color': (200, 50, 50),  # Red - Hard
+        'border_color': (255, 100, 100)
+    }
+}
 
 # UI Colors
 GLASS_BG = (0, 0, 0, 128) # 50% transparent black

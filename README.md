@@ -5,9 +5,12 @@ A retro-style space shooter game built with Pygame.
 ## Features
 - **Spaceship Control**: Navigate your ship to avoid obstacles.
 - **Shooting**: Blast asteroids with your laser.
-- **Power-ups**: Collect health and ammo power-ups.
+- **Power-ups**: Collect health, ammo, and upgrade power-ups.
+- **Boss Battles**: Face multiple bosses simultaneously with varying difficulty levels.
+  - **Visual Difficulty Indicators**: Bosses are color-coded (Green = Weak, Orange = Medium, Red = Strong)
+  - **Dynamic Difficulty**: Boss strength scales with health and projectile count
 - **High Scores**: Compete for the top spot on the leaderboard (MongoDB).
-- **Dynamic Difficulty**: Game gets harder as you progress.
+- **Progressive Difficulty**: Game gets harder as you progress through levels.
 
 ## Installation
 
