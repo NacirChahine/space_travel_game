@@ -3,3 +3,8 @@
 /.idea
 /__pycache__
 .env
+
+# build files
+/dist
+/build
+main.spec
