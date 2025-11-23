@@ -7,6 +7,7 @@ A retro-style space shooter game built with Pygame.
 - **Shooting**: Blast asteroids with your laser.
 - **Power-ups**: Collect health, ammo, and upgrade power-ups.
 - **Boss Battles**: Face multiple bosses simultaneously with varying difficulty levels.
+  - **Score-Based Spawning**: Bosses spawn at score milestones (200, 400, 600, 800, etc.)
   - **Visual Difficulty Indicators**: Bosses are color-coded (Green = Weak, Orange = Medium, Red = Strong)
   - **Dynamic Difficulty**: Boss strength scales with health and projectile count
 - **High Scores**: Compete for the top spot on the leaderboard (MongoDB).

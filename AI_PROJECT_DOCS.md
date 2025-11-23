@@ -29,6 +29,7 @@ The project follows a component-based architecture with a scene management syste
 - **GameScene**: Main gameplay loop with:
   - Dynamic asteroid spawning
   - Power-up collection system
+  - Score-based boss spawning (every 200 points: at scores 200, 400, 600, etc.)
   - Multiple simultaneous boss battles
   - Pause functionality
   - Progressive difficulty scaling

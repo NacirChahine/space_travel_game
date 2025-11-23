@@ -32,6 +32,7 @@ MAX_BULLETS = 20
 ASTEROID_SPEED_INITIAL = 5
 ASTEROID_SPEED_MAX = 15
 POWERUP_SPEED = 3
+AMMO_POWERUP_BULLETS = 5
 
 # Difficulty Settings
 LEVEL_SCORE_THRESHOLD = 50
@@ -49,7 +50,7 @@ UPGRADE_DURATION = 0 # Permanent until hit? Or temporary? Request implies perman
 
 # Boss
 BOSS_HEALTH_INITIAL = 5
-BOSS_SPAWN_SCORE = 100 # Score to spawn first boss
+BOSS_SPAWN_SCORE = 200 # Score to spawn bosses (every 200 points)
 BOSS_WIDTH = 80
 BOSS_HEIGHT = 80
 BOSS_PROJECTILE_SPEED = 7

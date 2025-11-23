@@ -212,7 +212,7 @@ class GameScene(Scene):
                 if self.lives < MAX_LIVES:
                     self.lives += 1
             elif hit.type == 'ammo':
-                self.spaceship.add_bullets(3)
+                self.spaceship.add_bullets(AMMO_POWERUP_BULLETS)
             elif hit.type == 'upgrade':
                 self.spaceship.upgrade()
 
