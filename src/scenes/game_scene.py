@@ -22,7 +22,9 @@ class GameScene(Scene):
         self.lives = PLAYER_LIVES
         self.asteroid_speed = ASTEROID_SPEED_INITIAL
         self.level = 1
+        self.level = 1
         self.asteroid_spawn_rate = ASTEROID_SPAWN_RATE_INITIAL
+        self.next_boss_score = BOSS_SPAWN_SCORE
         
         # Background
         self.background = Background()
@@ -101,28 +103,12 @@ class GameScene(Scene):
             self.powerup_timer = current_time
 
         # Spawn Boss
-        if self.score >= BOSS_SPAWN_SCORE and len(self.bosses) == 0 and self.score % BOSS_SPAWN_SCORE < 50: # Check condition to spawn periodically or once?
-            # Let's spawn every BOSS_SPAWN_SCORE points roughly, if not exists
-            # Better logic: if score > level * 100 and no boss?
-            # Simple logic for now: if score > 0 and score % 100 == 0 (hard to hit exact frame).
-            # Let's use a flag or check range.
-            # Or just check if score > last_boss_score + 100.
-            pass 
-        
-        # Better Boss Spawning Logic
-        # Spawn a boss every BOSS_SPAWN_SCORE points
-        if self.score > 0 and self.score % BOSS_SPAWN_SCORE == 0 and len(self.bosses) == 0:
-             # Ensure we don't spawn multiple if score stays same (it won't usually, but safety)
-             # Actually score increments by 1 or 10.
-             # Let's just spawn if no boss and score is high enough.
-             # Let's add a 'boss_level' tracker.
-             pass
-
-        if len(self.bosses) == 0 and self.score >= self.level * BOSS_SPAWN_SCORE:
+        if len(self.bosses) == 0 and self.score >= self.next_boss_score:
              # Spawn Boss
              boss = Boss(SCREEN_WIDTH // 2, 50, self.assets['boss_img'], self.assets['enemy_projectile_img'], BOSS_HEALTH_INITIAL + self.level)
              self.bosses.add(boss)
              self.all_sprites.add(boss)
+             self.next_boss_score += BOSS_SPAWN_SCORE
 
         # Update all sprites
         self.spaceship.update() # Handle input movement
@@ -148,7 +134,7 @@ class GameScene(Scene):
         for hit in hits:
             self.assets['asteroid_hit_sound'].play()
             self.score += 10
-            self.spaceship.add_bullets(1)
+            # self.spaceship.add_bullets(1) # Removed as per request
 
         # Collisions: Bullet - Boss
         hits = pygame.sprite.groupcollide(self.bosses, self.bullets, False, True)
