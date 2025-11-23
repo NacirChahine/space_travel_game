@@ -3,7 +3,7 @@ import os
 # Game Version
 # Update this version number when game mechanics or difficulty changes
 # Each version maintains its own separate leaderboard
-GAME_VERSION = "3.0.0"
+GAME_VERSION = "3.1.0"
 
 # Screen settings
 SCREEN_WIDTH = 1024

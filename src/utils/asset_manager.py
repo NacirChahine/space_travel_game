@@ -60,6 +60,17 @@ class AssetManager:
         # Generate Missile
         self.assets['missile_img'] = GraphicsGenerator.draw_missile(20, 40)
 
+        # Generate Explosion Frames
+        self.assets['explosion_frames'] = []
+        for i in range(10):
+            radius = 10 + i * 15 # Expanding radius
+            alpha = max(0, 255 - i * 25) # Fading out
+            color_core = (255, 255, 200, alpha)
+            color_outer = (255, 100, 0, alpha)
+            self.assets['explosion_frames'].append(
+                GraphicsGenerator.draw_explosion_frame(radius, color_core, color_outer)
+            )
+
         # Generate Boss
         self.assets['boss_img'] = GraphicsGenerator.draw_boss(BOSS_WIDTH, BOSS_HEIGHT)
         self.assets['enemy_projectile_img'] = GraphicsGenerator.draw_enemy_projectile(10, 10)

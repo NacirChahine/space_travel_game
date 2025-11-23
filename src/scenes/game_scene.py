@@ -8,6 +8,7 @@ from src.entities.bullet import Bullet
 from src.entities.powerup import PowerUp
 from src.entities.boss import Boss
 from src.entities.missile import Missile
+from src.entities.explosion import Explosion
 from src.ui.hud import HUD
 from src.core.background import Background
 from src.config import *
@@ -44,6 +45,7 @@ class GameScene(Scene):
         self.powerups = pygame.sprite.Group()
         self.bosses = pygame.sprite.Group()
         self.missiles_group = pygame.sprite.Group()
+        self.explosions = pygame.sprite.Group()
         self.enemy_projectiles = pygame.sprite.Group()
         self.all_sprites = pygame.sprite.Group()
         self.all_sprites.add(self.spaceship)
@@ -164,6 +166,7 @@ class GameScene(Scene):
         self.powerups.update()
         self.bosses.update()
         self.missiles_group.update()
+        self.explosions.update()
         self.enemy_projectiles.update()
 
         # Check for missile explosions
@@ -180,6 +183,12 @@ class GameScene(Scene):
                     projectile.kill()
                 
                 self.assets['end_bomb_sound'].play()
+                
+                # Spawn Explosion
+                explosion = Explosion(missile.rect.centerx, missile.rect.centery, self.assets['explosion_frames'])
+                self.explosions.add(explosion)
+                self.all_sprites.add(explosion)
+                
                 missile.kill()
         
         # Add new projectiles from bosses to groups

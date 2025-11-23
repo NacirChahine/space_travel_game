@@ -182,6 +182,17 @@ class GraphicsGenerator:
         # Left Fin
         pygame.draw.polygon(surface, fin_color, [(center_x - 5, height - 15), (0, height), (center_x - 5, height - 5)])
         # Right Fin
-        pygame.draw.polygon(surface, fin_color, [(center_x + 5, height - 15), (width, height), (center_x + 5, height - 5)])
+        return surface
+
+    @staticmethod
+    def draw_explosion_frame(radius, color_core, color_outer):
+        size = radius * 2
+        surface = pygame.Surface((size, size), pygame.SRCALPHA)
+        center = (radius, radius)
+        
+        # Outer glow
+        pygame.draw.circle(surface, color_outer, center, radius)
+        # Inner core
+        pygame.draw.circle(surface, color_core, center, radius * 0.7)
         
         return surface
