@@ -33,6 +33,12 @@ ASTEROID_SPEED_INITIAL = 5
 ASTEROID_SPEED_MAX = 15
 POWERUP_SPEED = 3
 
+# Difficulty Settings
+LEVEL_SCORE_THRESHOLD = 50
+ASTEROID_SPAWN_RATE_INITIAL = 1000
+ASTEROID_SPAWN_RATE_MIN = 300
+DIFFICULTY_MULTIPLIER = 0.9  # Multiply spawn rate by this every level
+
 # Events
 ASTEROID_SPAWN_EVENT = 0  # Will be set in pygame setup
 POWERUP_SPAWN_EVENT = 0   # Will be set in pygame setup

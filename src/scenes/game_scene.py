@@ -7,6 +7,7 @@ from src.entities.asteroid import Asteroid
 from src.entities.bullet import Bullet
 from src.entities.powerup import PowerUp
 from src.ui.hud import HUD
+from src.core.background import Background
 from src.config import *
 
 class GameScene(Scene):
@@ -19,7 +20,11 @@ class GameScene(Scene):
         self.score = 0
         self.lives = PLAYER_LIVES
         self.asteroid_speed = ASTEROID_SPEED_INITIAL
-        self.background_index = 0
+        self.level = 1
+        self.asteroid_spawn_rate = ASTEROID_SPAWN_RATE_INITIAL
+        
+        # Background
+        self.background = Background()
         
         # Entities
         self.spaceship = Spaceship(
@@ -45,7 +50,7 @@ class GameScene(Scene):
                 if event.key == pygame.K_SPACE:
                     bx, by = self.spaceship.shoot(None)
                     if bx is not None:
-                        bullet = Bullet(bx, by)
+                        bullet = Bullet(bx, by, self.assets['bullet_img'])
                         self.bullets.add(bullet)
                         self.all_sprites.add(bullet)
                         self.spaceship.decrease_bullets()
@@ -53,8 +58,11 @@ class GameScene(Scene):
     def update(self):
         current_time = pygame.time.get_ticks()
         
+        # Update Background
+        self.background.update()
+        
         # Spawn Asteroids
-        if current_time - self.asteroid_timer > 1000:
+        if current_time - self.asteroid_timer > self.asteroid_spawn_rate:
             asteroid = Asteroid(random.choice(self.assets['asteroid_images']), self.asteroid_speed)
             self.asteroids.add(asteroid)
             self.all_sprites.add(asteroid)
@@ -99,22 +107,15 @@ class GameScene(Scene):
             elif hit.type == 'ammo':
                 self.spaceship.add_bullets(3)
 
-        # Level Up
-        if self.score // 50 > self.background_index:
-            self.background_index = min(len(self.assets['background_images']) - 1, self.background_index + 1)
-            self.asteroid_speed = min(ASTEROID_SPEED_MAX, self.asteroid_speed + 1)
+        # Level Up / Difficulty Progression
+        new_level = (self.score // LEVEL_SCORE_THRESHOLD) + 1
+        if new_level > self.level:
+            self.level = new_level
+            # Increase difficulty
+            self.asteroid_speed = min(ASTEROID_SPEED_MAX, ASTEROID_SPEED_INITIAL + self.level)
+            self.asteroid_spawn_rate = max(ASTEROID_SPAWN_RATE_MIN, int(ASTEROID_SPAWN_RATE_INITIAL * (DIFFICULTY_MULTIPLIER ** (self.level - 1))))
 
-        # Remove off-screen asteroids (already handled in update, but check for score increment if they pass)
-        # Wait, Asteroid.update() kills it if it goes off screen. 
-        # But we need to increment score if it passes.
-        # Let's modify Asteroid update or handle it here.
-        # The original logic incremented score when asteroid passed.
-        # My Asteroid class kills itself. I should check if it was killed by going off screen?
-        # Or I can iterate and check y position before update?
-        # Actually, let's just iterate asteroids copy to check for passing.
-        # Or better, let's keep it simple: if asteroid is killed in update, we lose track.
-        # I'll modify Asteroid class later or just handle it here manually.
-        # For now, let's iterate and check.
+        # Remove off-screen asteroids and increment score
         for asteroid in self.asteroids:
             if asteroid.rect.y > SCREEN_HEIGHT:
                 asteroid.kill()
@@ -122,7 +123,7 @@ class GameScene(Scene):
 
     def render(self, screen):
         # Background
-        screen.blit(self.assets['background_images'][self.background_index], (0, 0))
+        self.background.draw(screen)
         
         # Sprites
         self.all_sprites.draw(screen)

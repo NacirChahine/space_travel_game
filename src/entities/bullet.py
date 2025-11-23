@@ -3,15 +3,10 @@ from src.entities.entity import Entity
 from src.config import *
 
 class Bullet(Entity):
-    def __init__(self, x, y):
-        # Create a simple surface for the bullet if no image is provided, 
-        # but ideally we should pass an image or create one.
-        # For now, let's create a surface here to match the original logic 
-        # which drew a rect. Or we can use a passed image.
-        # Let's assume we'll pass a surface or create one.
-        image = pygame.Surface((BULLET_WIDTH, BULLET_HEIGHT))
-        image.fill(WHITE)
+    def __init__(self, x, y, image):
         super().__init__(x, y, image)
+        self.speed = 10  # Increased speed for better feel
+
         self.speed = 5
 
     def update(self):
