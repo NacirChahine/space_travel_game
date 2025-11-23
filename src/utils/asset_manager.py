@@ -26,8 +26,13 @@ class AssetManager:
             self.assets['logo_img'] = pygame.Surface((400, 300))
             self.assets['logo_img'].fill(BLACK)
 
-        # Generate spaceship
-        self.assets['spaceship_img'] = GraphicsGenerator.draw_spaceship(SPACESHIP_WIDTH, SPACESHIP_HEIGHT)
+        # Generate spaceship levels
+        self.assets['spaceship_levels'] = {
+            1: GraphicsGenerator.draw_spaceship(SPACESHIP_WIDTH, SPACESHIP_HEIGHT, 1),
+            2: GraphicsGenerator.draw_spaceship(SPACESHIP_WIDTH, SPACESHIP_HEIGHT, 2),
+            3: GraphicsGenerator.draw_spaceship(SPACESHIP_WIDTH, SPACESHIP_HEIGHT, 3)
+        }
+        self.assets['spaceship_img'] = self.assets['spaceship_levels'][1] # Default
 
         # Generate asteroids
         # Create a few variations
@@ -41,7 +46,16 @@ class AssetManager:
         self.assets['background_images'] = [] 
 
         # Generate Bullet
-        self.assets['bullet_img'] = GraphicsGenerator.draw_bullet(BULLET_WIDTH, BULLET_HEIGHT)
+        self.assets['bullet_img'] = GraphicsGenerator.draw_bullet(BULLET_WIDTH, BULLET_HEIGHT, 1)
+        self.assets['bullet_levels'] = {
+            1: GraphicsGenerator.draw_bullet(BULLET_WIDTH, BULLET_HEIGHT, 1),
+            2: GraphicsGenerator.draw_bullet(BULLET_WIDTH, BULLET_HEIGHT, 2),
+            3: GraphicsGenerator.draw_bullet(BULLET_WIDTH, BULLET_HEIGHT, 3)
+        }
+
+        # Generate Boss
+        self.assets['boss_img'] = GraphicsGenerator.draw_boss(BOSS_WIDTH, BOSS_HEIGHT)
+        self.assets['enemy_projectile_img'] = GraphicsGenerator.draw_enemy_projectile(10, 10)
 
         # Load sounds
         pygame.mixer.init()
@@ -79,6 +93,21 @@ class AssetManager:
         pygame.draw.rect(ammo_pu_surf, YELLOW, (10, 8, 10, 14))
         pygame.draw.polygon(ammo_pu_surf, YELLOW, [(10, 8), (20, 8), (15, 2)])
         self.assets['ammo_powerup_img'] = ammo_pu_surf
+
+        # Upgrade Power-up (Blue Up Arrow)
+        upgrade_pu_surf = pygame.Surface((POWERUP_WIDTH, POWERUP_HEIGHT), pygame.SRCALPHA)
+        pygame.draw.circle(upgrade_pu_surf, (50, 50, 100), (POWERUP_WIDTH // 2, POWERUP_HEIGHT // 2), POWERUP_WIDTH // 2)
+        # Draw arrow
+        pygame.draw.polygon(upgrade_pu_surf, (0, 255, 255), [
+            (POWERUP_WIDTH // 2, 5), 
+            (POWERUP_WIDTH - 5, POWERUP_HEIGHT // 2), 
+            (POWERUP_WIDTH // 2 + 5, POWERUP_HEIGHT // 2),
+            (POWERUP_WIDTH // 2 + 5, POWERUP_HEIGHT - 5),
+            (POWERUP_WIDTH // 2 - 5, POWERUP_HEIGHT - 5),
+            (POWERUP_WIDTH // 2 - 5, POWERUP_HEIGHT // 2),
+            (5, POWERUP_HEIGHT // 2)
+        ])
+        self.assets['upgrade_powerup_img'] = upgrade_pu_surf
 
     def get_asset(self, name):
         return self.assets.get(name)

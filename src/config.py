@@ -42,3 +42,19 @@ DIFFICULTY_MULTIPLIER = 0.9  # Multiply spawn rate by this every level
 # Events
 ASTEROID_SPAWN_EVENT = 0  # Will be set in pygame setup
 POWERUP_SPAWN_EVENT = 0   # Will be set in pygame setup
+
+# Upgrades
+SPACESHIP_LEVEL_MAX = 3
+UPGRADE_DURATION = 0 # Permanent until hit? Or temporary? Request implies permanent until hit.
+
+# Boss
+BOSS_HEALTH_INITIAL = 5
+BOSS_SPAWN_SCORE = 100 # Score to spawn first boss
+BOSS_WIDTH = 80
+BOSS_HEIGHT = 80
+BOSS_PROJECTILE_SPEED = 7
+
+# UI Colors
+GLASS_BG = (0, 0, 0, 128) # 50% transparent black
+GLASS_BORDER = (255, 255, 255, 100) # Semi-transparent white
+LEVEL_BAR_COLOR = (0, 255, 255) # Cyan for level

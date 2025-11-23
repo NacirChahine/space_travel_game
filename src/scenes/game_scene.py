@@ -6,6 +6,7 @@ from src.entities.spaceship import Spaceship
 from src.entities.asteroid import Asteroid
 from src.entities.bullet import Bullet
 from src.entities.powerup import PowerUp
+from src.entities.boss import Boss
 from src.ui.hud import HUD
 from src.core.background import Background
 from src.config import *
@@ -33,10 +34,13 @@ class GameScene(Scene):
             self.assets['spaceship_img'],
             self.assets['fire_sound']
         )
+        self.spaceship.set_assets(self.assets)
         
         self.asteroids = pygame.sprite.Group()
         self.bullets = pygame.sprite.Group()
         self.powerups = pygame.sprite.Group()
+        self.bosses = pygame.sprite.Group()
+        self.enemy_projectiles = pygame.sprite.Group()
         self.all_sprites = pygame.sprite.Group()
         self.all_sprites.add(self.spaceship)
         
@@ -57,11 +61,12 @@ class GameScene(Scene):
 
                 if not self.paused:
                     if event.key == pygame.K_SPACE:
-                        bx, by = self.spaceship.shoot(None)
-                        if bx is not None:
-                            bullet = Bullet(bx, by, self.assets['bullet_img'])
+                        new_bullets = self.spaceship.shoot(self.assets['bullet_img'])
+                        for bx, by, img in new_bullets:
+                            bullet = Bullet(bx, by, img)
                             self.bullets.add(bullet)
                             self.all_sprites.add(bullet)
+                        if new_bullets:
                             self.spaceship.decrease_bullets()
 
     def update(self):
@@ -82,18 +87,61 @@ class GameScene(Scene):
             
         # Spawn Powerups
         if current_time - self.powerup_timer > 5000:
-            type = random.choice(['health', 'ammo'])
-            img = self.assets['health_powerup_img'] if type == 'health' else self.assets['ammo_powerup_img']
+            type = random.choice(['health', 'ammo', 'upgrade'])
+            if type == 'health':
+                img = self.assets['health_powerup_img']
+            elif type == 'ammo':
+                img = self.assets['ammo_powerup_img']
+            else:
+                img = self.assets['upgrade_powerup_img']
+                
             powerup = PowerUp(img, type)
             self.powerups.add(powerup)
             self.all_sprites.add(powerup)
             self.powerup_timer = current_time
+
+        # Spawn Boss
+        if self.score >= BOSS_SPAWN_SCORE and len(self.bosses) == 0 and self.score % BOSS_SPAWN_SCORE < 50: # Check condition to spawn periodically or once?
+            # Let's spawn every BOSS_SPAWN_SCORE points roughly, if not exists
+            # Better logic: if score > level * 100 and no boss?
+            # Simple logic for now: if score > 0 and score % 100 == 0 (hard to hit exact frame).
+            # Let's use a flag or check range.
+            # Or just check if score > last_boss_score + 100.
+            pass 
+        
+        # Better Boss Spawning Logic
+        # Spawn a boss every BOSS_SPAWN_SCORE points
+        if self.score > 0 and self.score % BOSS_SPAWN_SCORE == 0 and len(self.bosses) == 0:
+             # Ensure we don't spawn multiple if score stays same (it won't usually, but safety)
+             # Actually score increments by 1 or 10.
+             # Let's just spawn if no boss and score is high enough.
+             # Let's add a 'boss_level' tracker.
+             pass
+
+        if len(self.bosses) == 0 and self.score >= self.level * BOSS_SPAWN_SCORE:
+             # Spawn Boss
+             boss = Boss(SCREEN_WIDTH // 2, 50, self.assets['boss_img'], self.assets['enemy_projectile_img'], BOSS_HEALTH_INITIAL + self.level)
+             self.bosses.add(boss)
+             self.all_sprites.add(boss)
 
         # Update all sprites
         self.spaceship.update() # Handle input movement
         self.bullets.update()
         self.asteroids.update()
         self.powerups.update()
+        self.bosses.update()
+        self.enemy_projectiles.update()
+        
+        # Add new projectiles from bosses to groups
+        for boss in self.bosses:
+            for projectile in boss.projectiles:
+                if projectile not in self.enemy_projectiles:
+                    self.enemy_projectiles.add(projectile)
+                    self.all_sprites.add(projectile)
+            # Clear boss projectiles group to avoid re-adding (or just use group logic)
+            # Actually boss.projectiles is a group.
+            # We can just add them.
+            pass
 
         # Collisions: Bullet - Asteroid
         hits = pygame.sprite.groupcollide(self.asteroids, self.bullets, True, True)
@@ -102,11 +150,42 @@ class GameScene(Scene):
             self.score += 10
             self.spaceship.add_bullets(1)
 
+        # Collisions: Bullet - Boss
+        hits = pygame.sprite.groupcollide(self.bosses, self.bullets, False, True)
+        for boss, bullets in hits.items():
+            self.assets['asteroid_hit_sound'].play()
+            for b in bullets:
+                if boss.take_damage():
+                    boss.kill()
+                    self.score += 50
+                    self.assets['end_bomb_sound'].play() # Reuse sound for boss death
+
         # Collisions: Spaceship - Asteroid
         hits = pygame.sprite.spritecollide(self.spaceship, self.asteroids, True)
         for hit in hits:
             self.assets['crash_sound'].play()
             self.lives -= 1
+            self.spaceship.downgrade()
+            if self.lives == 0:
+                self.game.state_manager.change_scene(GameOverScene(self.game, self.score))
+
+        # Collisions: Spaceship - Boss
+        hits = pygame.sprite.spritecollide(self.spaceship, self.bosses, False)
+        for hit in hits:
+            self.assets['crash_sound'].play()
+            self.lives -= 1
+            self.spaceship.downgrade()
+            # Push back spaceship? Or invulnerability? 
+            # For now just simple hit.
+            if self.lives == 0:
+                self.game.state_manager.change_scene(GameOverScene(self.game, self.score))
+
+        # Collisions: Spaceship - Enemy Projectile
+        hits = pygame.sprite.spritecollide(self.spaceship, self.enemy_projectiles, True)
+        for hit in hits:
+            self.assets['crash_sound'].play()
+            self.lives -= 1
+            self.spaceship.downgrade()
             if self.lives == 0:
                 self.game.state_manager.change_scene(GameOverScene(self.game, self.score))
 
@@ -118,6 +197,8 @@ class GameScene(Scene):
                     self.lives += 1
             elif hit.type == 'ammo':
                 self.spaceship.add_bullets(3)
+            elif hit.type == 'upgrade':
+                self.spaceship.upgrade()
 
         # Level Up / Difficulty Progression
         new_level = (self.score // LEVEL_SCORE_THRESHOLD) + 1
@@ -141,7 +222,7 @@ class GameScene(Scene):
         self.all_sprites.draw(screen)
         
         # HUD
-        self.hud.draw(screen, self.lives, MAX_LIVES, self.spaceship.available_bullets, MAX_BULLETS, self.score)
+        self.hud.draw(screen, self.lives, MAX_LIVES, self.spaceship.available_bullets, MAX_BULLETS, self.score, self.spaceship.level)
 
         if self.paused:
             self.draw_pause_screen(screen)

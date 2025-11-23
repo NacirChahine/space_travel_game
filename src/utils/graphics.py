@@ -5,13 +5,21 @@ from src.config import *
 
 class GraphicsGenerator:
     @staticmethod
-    def draw_spaceship(width, height):
+    def draw_spaceship(width, height, level=1):
         surface = pygame.Surface((width, height), pygame.SRCALPHA)
         
-        # Colors
-        hull_color = (200, 200, 255)
+        # Colors based on level
+        if level == 1:
+            hull_color = (200, 200, 255)
+            engine_color = (255, 100, 0)
+        elif level == 2:
+            hull_color = (150, 150, 255)
+            engine_color = (255, 50, 0)
+        else: # Level 3
+            hull_color = (100, 100, 255)
+            engine_color = (255, 0, 0)
+            
         cockpit_color = (0, 255, 255)
-        engine_color = (255, 100, 0)
         detail_color = (100, 100, 150)
         
         center_x = width // 2
@@ -26,6 +34,17 @@ class GraphicsGenerator:
         pygame.draw.polygon(surface, hull_color, points)
         pygame.draw.polygon(surface, detail_color, points, 2) # Outline
         
+        # Additional details for higher levels
+        if level >= 2:
+            # Side wings
+            pygame.draw.polygon(surface, hull_color, [(0, height-20), (-10, height), (10, height-10)])
+            pygame.draw.polygon(surface, hull_color, [(width, height-20), (width+10, height), (width-10, height-10)])
+            
+        if level >= 3:
+            # Extra cannons
+            pygame.draw.rect(surface, detail_color, (center_x - 15, height - 15, 4, 15))
+            pygame.draw.rect(surface, detail_color, (center_x + 11, height - 15, 4, 15))
+
         # Cockpit
         cockpit_rect = pygame.Rect(center_x - 5, height // 2 - 10, 10, 15)
         pygame.draw.ellipse(surface, cockpit_color, cockpit_rect)
@@ -77,15 +96,66 @@ class GraphicsGenerator:
         return surface
 
     @staticmethod
-    def draw_bullet(width, height):
+    def draw_bullet(width, height, level=1):
         surface = pygame.Surface((width, height), pygame.SRCALPHA)
         
+        # Colors based on level
+        if level == 1:
+            glow_color = (255, 255, 0, 100)
+            core_color = (255, 255, 255)
+        elif level == 2:
+            glow_color = (0, 255, 255, 100)
+            core_color = (200, 255, 255)
+        else:
+            glow_color = (255, 0, 255, 100)
+            core_color = (255, 200, 255)
+
         # Glowing effect
         # Outer glow
-        pygame.draw.rect(surface, (255, 255, 0, 100), (0, 0, width, height), border_radius=2)
+        pygame.draw.rect(surface, glow_color, (0, 0, width, height), border_radius=2)
         # Inner core
-        pygame.draw.rect(surface, (255, 255, 255), (1, 1, width - 2, height - 2), border_radius=2)
+        pygame.draw.rect(surface, core_color, (1, 1, width - 2, height - 2), border_radius=2)
         
+        return surface
+
+    @staticmethod
+    def draw_boss(width, height):
+        surface = pygame.Surface((width, height), pygame.SRCALPHA)
+        
+        # Boss Colors
+        body_color = (100, 0, 0)
+        detail_color = (200, 50, 50)
+        core_color = (255, 0, 0)
+        
+        center_x, center_y = width // 2, height // 2
+        
+        # Main Body (Hexagon-ish)
+        points = [
+            (center_x, 0),
+            (width, height // 3),
+            (width, height * 2 // 3),
+            (center_x, height),
+            (0, height * 2 // 3),
+            (0, height // 3)
+        ]
+        pygame.draw.polygon(surface, body_color, points)
+        pygame.draw.polygon(surface, detail_color, points, 3)
+        
+        # Glowing Core
+        pygame.draw.circle(surface, core_color, (center_x, center_y), width // 4)
+        pygame.draw.circle(surface, (255, 100, 100), (center_x, center_y), width // 6)
+        
+        # Weapon Mounts
+        pygame.draw.circle(surface, detail_color, (10, height // 2), 8)
+        pygame.draw.circle(surface, detail_color, (width - 10, height // 2), 8)
+        
+        return surface
+
+    @staticmethod
+    def draw_enemy_projectile(width, height):
+        surface = pygame.Surface((width, height), pygame.SRCALPHA)
+        pygame.draw.circle(surface, (255, 0, 0), (width // 2, height // 2), width // 2)
+        pygame.draw.circle(surface, (255, 255, 0), (width // 2, height // 2), width // 4)
         return surface
     
     @staticmethod
