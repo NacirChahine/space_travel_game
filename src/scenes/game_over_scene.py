@@ -16,12 +16,13 @@ class GameOverScene(Scene):
         # Background
         self.background = Background()
         
-        # Button positioned at ~57.8% from top, 12.5% width, centered
+        # Button positioned at bottom with padding
         button_width = int(SCREEN_WIDTH * 0.125)
         button_height = int(SCREEN_HEIGHT * 0.056)
+        padding_bottom = int(SCREEN_HEIGHT * 0.05)
         self.replay_button = Button(
             SCREEN_WIDTH // 2 - button_width // 2, 
-            int(SCREEN_HEIGHT * 0.578), 
+            SCREEN_HEIGHT - button_height - padding_bottom, 
             button_width, 
             button_height, 
             "Replay", 

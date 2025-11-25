@@ -39,14 +39,14 @@ class HUD:
         bar_height = int(SCREEN_HEIGHT * 0.033)  # 3.3% of screen height (~30px at 900px)
         margin = int(SCREEN_WIDTH * 0.0125)  # 1.25% margin (~20px at 1600px)
         
-        # Health Bar (Top Left) - at 2.2% from top
+        # Health Bar (Top Left) - increased margin to fit label
         health_text = f"{lives}/{max_lives}"
-        health_y = int(SCREEN_HEIGHT * 0.022)
+        health_y = int(SCREEN_HEIGHT * 0.06)
         self.draw_glass_bar(screen, margin, health_y, bar_width, bar_height, lives / max_lives, RED, "Health", health_text)
         
-        # Level Bar (Below Health) - at 8.9% from top
+        # Level Bar (Below Health)
         level_text = f"{level}/{SPACESHIP_LEVEL_MAX}"
-        level_y = int(SCREEN_HEIGHT * 0.089)
+        level_y = int(SCREEN_HEIGHT * 0.12)
         self.draw_glass_bar(screen, margin, level_y, bar_width, bar_height, level / SPACESHIP_LEVEL_MAX, LEVEL_BAR_COLOR, "Ship Level", level_text)
 
         # Ammo Bar (Bottom Left) - at 93.3% from top

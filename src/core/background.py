@@ -75,11 +75,14 @@ class Background:
         meteor_surf = pygame.Surface((length, width), pygame.SRCALPHA)
         
         # Gradient from bright white to orange/yellow
+        # Draw with Head at Right (length) and Tail at Left (0)
         for i in range(length):
-            alpha = int(255 * (1 - i / length))
-            if i < length * 0.3:
-                color = (255, 255, 255, alpha)  # White core
-            elif i < length * 0.6:
+            # Alpha increases towards the head (Right)
+            alpha = int(255 * (i / length))
+            
+            if i > length * 0.7:
+                color = (255, 255, 255, alpha)  # White core (Head)
+            elif i > length * 0.4:
                 color = (255, 200, 100, alpha)  # Yellow
             else:
                 color = (255, 150, 50, alpha)   # Orange tail
@@ -91,7 +94,8 @@ class Background:
             'speed_x': speed_x,
             'speed_y': speed_y,
             'img': meteor_surf,
-            'angle': math.degrees(math.atan2(speed_y, speed_x))
+            # Calculate angle for rotation (negative Y because screen Y is down)
+            'angle': math.degrees(math.atan2(-speed_y, speed_x))
         })
 
     def update(self):

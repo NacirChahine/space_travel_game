@@ -78,10 +78,10 @@ class WelcomeScene(Scene):
         # Draw background with stars and meteors
         self.background.draw(screen)
         
-        # Logo - positioned at ~12% from top, centered horizontally
+        # Logo - centered in viewport
         logo = self.assets['logo_img']
-        logo_y = int(SCREEN_HEIGHT * 0.122)  # ~110px at 900p
-        screen.blit(logo, (SCREEN_WIDTH // 2 - logo.get_width() // 3, logo_y))
+        logo_y = SCREEN_HEIGHT // 2 - logo.get_height() // 2
+        screen.blit(logo, (SCREEN_WIDTH // 2 - logo.get_width() // 2, logo_y))
 
         # Title - positioned at ~5.6% from top
         title_text = self.title_font.render("Welcome to Spaceship Game!", True, WHITE)
@@ -89,16 +89,22 @@ class WelcomeScene(Scene):
         title_y = int(SCREEN_HEIGHT * 0.056)  # ~50px at 900p
         screen.blit(title_text, (title_text_x, title_y))
 
-        # Blink text - positioned at ~49% from top
+        # Calculate positions for bottom text
+        line_spacing = int(SCREEN_HEIGHT * 0.033)  # ~30px at 900p
+        num_lines = len(self.wrapped_fact_lines)
+        total_fact_height = num_lines * line_spacing
+        bottom_padding = int(SCREEN_HEIGHT * 0.05)
+        
+        fact_start_y = SCREEN_HEIGHT - total_fact_height - bottom_padding
+
+        # Blink text - positioned above facts
         if self.blink:
             enter_text = self.title_font.render("Press ENTER to Start", True, RED)
             enter_text_x = SCREEN_WIDTH // 2 - enter_text.get_width() // 2
-            enter_y = int(SCREEN_HEIGHT * 0.489)  # ~440px at 900p
+            enter_y = fact_start_y - enter_text.get_height() - int(SCREEN_HEIGHT * 0.02)
             screen.blit(enter_text, (enter_text_x, enter_y))
 
-        # Fact - positioned at ~55.6% from top
-        fact_start_y = int(SCREEN_HEIGHT * 0.556)  # ~500px at 900p
-        line_spacing = int(SCREEN_HEIGHT * 0.033)  # ~30px at 900p
+        # Fact - positioned at bottom
         for i, line in enumerate(self.wrapped_fact_lines):
             fact_text = self.font.render(line, True, YELLOW)
             fact_text_x = SCREEN_WIDTH // 2 - fact_text.get_width() // 2
