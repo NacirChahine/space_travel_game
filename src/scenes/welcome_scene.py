@@ -2,14 +2,18 @@ import pygame
 import random
 from src.scenes.scene import Scene
 from src.utils.helpers import split_text
+from src.core.background import Background
 from src.config import *
 
 class WelcomeScene(Scene):
     def __init__(self, game):
         super().__init__(game)
         self.assets = self.game.asset_manager.assets
-        self.font = pygame.font.SysFont(None, 30)
-        self.title_font = pygame.font.SysFont(None, 50)
+        self.font = pygame.font.SysFont(None, int(SCREEN_HEIGHT * 0.033))  # ~30px at 900p
+        self.title_font = pygame.font.SysFont(None, int(SCREEN_HEIGHT * 0.056))  # ~50px at 900p
+        
+        # Background
+        self.background = Background()
         
         self.space_facts = [
             "The Milky Way galaxy contains over 100 billion stars.",
@@ -49,7 +53,8 @@ class WelcomeScene(Scene):
             "The Sun's core temperature is about 15 million degrees Celsius."
         ]
         self.random_fact = random.choice(self.space_facts)
-        self.wrapped_fact_lines = split_text(self.random_fact, self.font, 760)
+        # Wrap text based on screen width (about 47.5% of screen width for text area)
+        self.wrapped_fact_lines = split_text(self.random_fact, self.font, int(SCREEN_WIDTH * 0.475))
         
         self.blink = True
         self.blink_timer = pygame.time.get_ticks()
@@ -61,30 +66,40 @@ class WelcomeScene(Scene):
                 self.game.state_manager.change_scene(GameScene(self.game))
 
     def update(self):
+        # Update background
+        self.background.update()
+        
+        # Blinking text
         if pygame.time.get_ticks() - self.blink_timer > 500:
             self.blink = not self.blink
             self.blink_timer = pygame.time.get_ticks()
 
     def render(self, screen):
-        screen.fill(BLACK)
+        # Draw background with stars and meteors
+        self.background.draw(screen)
         
-        # Logo
+        # Logo - positioned at ~12% from top, centered horizontally
         logo = self.assets['logo_img']
-        screen.blit(logo, (SCREEN_WIDTH // 2 - logo.get_width() // 3, 110))
+        logo_y = int(SCREEN_HEIGHT * 0.122)  # ~110px at 900p
+        screen.blit(logo, (SCREEN_WIDTH // 2 - logo.get_width() // 3, logo_y))
 
-        # Fact
-        for i, line in enumerate(self.wrapped_fact_lines):
-            fact_text = self.font.render(line, True, YELLOW)
-            fact_text_x = SCREEN_WIDTH // 2 - fact_text.get_width() // 2
-            screen.blit(fact_text, (fact_text_x, 500 + i * 30))
-
-        # Title
+        # Title - positioned at ~5.6% from top
         title_text = self.title_font.render("Welcome to Spaceship Game!", True, WHITE)
         title_text_x = SCREEN_WIDTH // 2 - title_text.get_width() // 2
-        screen.blit(title_text, (title_text_x, 50))
+        title_y = int(SCREEN_HEIGHT * 0.056)  # ~50px at 900p
+        screen.blit(title_text, (title_text_x, title_y))
 
-        # Blink text
+        # Blink text - positioned at ~49% from top
         if self.blink:
             enter_text = self.title_font.render("Press ENTER to Start", True, RED)
             enter_text_x = SCREEN_WIDTH // 2 - enter_text.get_width() // 2
-            screen.blit(enter_text, (enter_text_x, 440))
+            enter_y = int(SCREEN_HEIGHT * 0.489)  # ~440px at 900p
+            screen.blit(enter_text, (enter_text_x, enter_y))
+
+        # Fact - positioned at ~55.6% from top
+        fact_start_y = int(SCREEN_HEIGHT * 0.556)  # ~500px at 900p
+        line_spacing = int(SCREEN_HEIGHT * 0.033)  # ~30px at 900p
+        for i, line in enumerate(self.wrapped_fact_lines):
+            fact_text = self.font.render(line, True, YELLOW)
+            fact_text_x = SCREEN_WIDTH // 2 - fact_text.get_width() // 2
+            screen.blit(fact_text, (fact_text_x, fact_start_y + i * line_spacing))

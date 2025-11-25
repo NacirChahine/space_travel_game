@@ -3,11 +3,11 @@ import os
 # Game Version
 # Update this version number when game mechanics or difficulty changes
 # Each version maintains its own separate leaderboard
-GAME_VERSION = "3.1.0"
+GAME_VERSION = "3.1.1"
 
 # Screen settings
-SCREEN_WIDTH = 1024
-SCREEN_HEIGHT = 600
+SCREEN_WIDTH = 1600
+SCREEN_HEIGHT = 900
 FPS = 60
 
 # Colors

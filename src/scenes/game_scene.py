@@ -57,7 +57,7 @@ class GameScene(Scene):
         # Pause State
         self.paused = False
         self.pause_start_time = 0
-        self.font_pause_sub = pygame.font.Font(None, 36)
+        self.font_pause_sub = pygame.font.Font(None, int(SCREEN_HEIGHT * 0.04))  # ~36px at 900p
 
     def process_input(self, events):
         for event in events:
@@ -305,16 +305,17 @@ class GameScene(Scene):
         overlay.fill((0, 0, 0, 128)) # Semi-transparent black
         screen.blit(overlay, (0, 0))
         
-        # Pause Icon (Two vertical bars)
+        # Pause Icon (Two vertical bars) - centered and sized proportionally
         center_x, center_y = SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2
-        bar_width = 20
-        bar_height = 60
-        gap = 20
+        bar_width = int(SCREEN_WIDTH * 0.0125)  # ~20px at 1600px
+        bar_height = int(SCREEN_HEIGHT * 0.067)  # ~60px at 900px
+        gap = int(SCREEN_WIDTH * 0.0125)  # ~20px at 1600px
+        icon_offset_y = int(SCREEN_HEIGHT * 0.022)  # ~20px offset
         
-        pygame.draw.rect(screen, WHITE, (center_x - gap//2 - bar_width, center_y - bar_height//2 - 20, bar_width, bar_height))
-        pygame.draw.rect(screen, WHITE, (center_x + gap//2, center_y - bar_height//2 - 20, bar_width, bar_height))
+        pygame.draw.rect(screen, WHITE, (center_x - gap//2 - bar_width, center_y - bar_height//2 - icon_offset_y, bar_width, bar_height))
+        pygame.draw.rect(screen, WHITE, (center_x + gap//2, center_y - bar_height//2 - icon_offset_y, bar_width, bar_height))
         
         # Text
         text_surf = self.font_pause_sub.render("Press P to Unpause", True, WHITE)
-        text_rect = text_surf.get_rect(center=(center_x, center_y + 40))
+        text_rect = text_surf.get_rect(center=(center_x, center_y + int(SCREEN_HEIGHT * 0.044)))
         screen.blit(text_surf, text_rect)

@@ -5,6 +5,11 @@ A retro-style space shooter game built with Pygame.
 ## Features
 - **Spaceship Control**: Navigate your ship to avoid obstacles.
 - **Shooting**: Blast asteroids with your laser.
+- **Dynamic Visuals**: Immersive space environment with:
+  - **Animated Star Field**: Multi-layered parallax stars with realistic twinkling effects
+  - **Meteor Showers**: Dynamic meteors streaking across the screen with gradient tails
+  - **Nebula Effects**: Semi-transparent cosmic clouds drifting in the background
+  - **Responsive Design**: All UI elements scale proportionally with screen dimensions (currently 1600x900)
 - **Spaceship Upgrades**: Level up your spaceship to unlock powerful bullet patterns (up to Level 5 with angled shots).
 - **Missile System**: Collect and fire missiles (Press 'M') to clear the screen of enemies.
   - Missiles dynamically target the viewport center, accounting for camera movement

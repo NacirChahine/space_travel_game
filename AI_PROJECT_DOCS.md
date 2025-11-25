@@ -37,7 +37,7 @@ The project follows a component-based architecture with a scene management syste
 - **EnemyProjectile**: Projectiles fired by bosses.
 
 ### Scenes
-- **WelcomeScene**: Start screen.
+- **WelcomeScene**: Start screen with space-themed background, animated stars, and meteor effects.
 - **GameScene**: Main gameplay loop with:
   - Dynamic asteroid spawning
   - Power-up collection system
@@ -49,7 +49,20 @@ The project follows a component-based architecture with a scene management syste
     - Health: current/max (e.g., "3/5") - centered inside health bar
     - Ammo: current/max (e.g., "12/20") - centered inside ammo bar
     - Ship Level: current/max (e.g., "2/5") - centered inside level bar
-- **GameOverScene**: End screen with high scores.
+- **GameOverScene**: End screen with high scores, animated space background.
+
+### Background & Visual Effects
+- **Responsive Design**: All UI elements (buttons, text, HUD bars, screens) use proportional positioning based on `SCREEN_WIDTH` and `SCREEN_HEIGHT` constants from `config.py`
+  - Current dimensions: 1600x900
+  - All layouts adapt automatically if screen dimensions are changed
+  - Font sizes, margins, and element positioning use percentage-based calculations
+- **Dynamic Space Background**: Three-layered parallax star field with:
+  - **Twinkling Stars**: Stars vary in brightness using sine wave animation for realistic twinkling
+  - **Meteor Showers**: Meteors spawn at random intervals (3-6 seconds) with:
+    - Diagonal trajectories across the screen
+    - Gradient tails (white core → yellow → orange)
+    - Smooth rotation matching movement direction
+  - **Nebula Effects**: Semi-transparent cosmic clouds with slow drift movement
 
 ## Development
 - **Language**: Python 3.x
