@@ -3,7 +3,9 @@
 A retro-style space shooter game built with Pygame.
 
 ## Features
-- **Spaceship Control**: Navigate your ship to avoid obstacles.
+- **Spaceship Control**: Navigate your ship horizontally and vertically to avoid obstacles.
+  - **Movement**: Use arrow keys for full directional control (left, right, up, down)
+  - **Invincibility**: 2-second invincibility period after taking damage with blinking visual effect
 - **Shooting**: Blast asteroids with your laser.
 - **Dynamic Visuals**: Immersive space environment with:
   - **Animated Star Field**: Multi-layered parallax stars with realistic twinkling effects
@@ -82,7 +84,7 @@ The project is organized into a modular structure:
 - `src/database`: Database connection logic.
 
 ## Controls
-- **Arrow Keys**: Move spaceship.
+- **Arrow Keys**: Move spaceship (left, right, up, down).
 - **Space**: Shoot.
 - **M**: Fire missile (when available).
 - **P**: Pause/Unpause game.

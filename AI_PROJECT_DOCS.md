@@ -15,6 +15,8 @@ The project follows a component-based architecture with a scene management syste
 ### Entities
 - **Entity**: Base class for all game objects.
 - **Spaceship**: Player character with upgrade levels (1-5) and weapon systems.
+  - **Movement**: Horizontal (LEFT/RIGHT) and vertical (UP/DOWN arrow keys) with screen boundary constraints
+  - **Invincibility**: 2-second invincibility period after taking damage with blinking visual effect (100ms intervals)
   - **Level 1**: Light blue hull, single orange engine
   - **Level 2**: Medium blue hull, enhanced side wings, single red engine
   - **Level 3**: Deep blue hull, extra cannons, single bright red engine

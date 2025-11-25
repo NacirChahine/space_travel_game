@@ -277,51 +277,58 @@ class GameScene(Scene):
                     self.score += SHOOTER_SCORE_VALUE
 
         # Collisions: Spaceship - Asteroid
-        hits = pygame.sprite.spritecollide(self.spaceship, self.asteroids, True)
+        hits = pygame.sprite.spritecollide(self.spaceship, self.asteroids, False)
         for hit in hits:
-            self.assets['crash_sound'].play()
-            self.lives -= 1
-            self.spaceship.downgrade()
-            if self.lives == 0:
-                self.game.state_manager.change_scene(GameOverScene(self.game, self.score))
+            if self.spaceship.take_damage():
+                hit.kill()  # Remove asteroid only if damage was applied
+                self.assets['crash_sound'].play()
+                self.lives -= 1
+                self.spaceship.downgrade()
+                if self.lives == 0:
+                    self.game.state_manager.change_scene(GameOverScene(self.game, self.score))
 
         # Collisions: Spaceship - Boss
         hits = pygame.sprite.spritecollide(self.spaceship, self.bosses, False)
         for hit in hits:
-            self.assets['crash_sound'].play()
-            self.lives -= 1
-            self.spaceship.downgrade()
-            # Push back spaceship? Or invulnerability? 
-            # For now just simple hit.
-            if self.lives == 0:
-                self.game.state_manager.change_scene(GameOverScene(self.game, self.score))
+            if self.spaceship.take_damage():
+                self.assets['crash_sound'].play()
+                self.lives -= 1
+                self.spaceship.downgrade()
+                if self.lives == 0:
+                    self.game.state_manager.change_scene(GameOverScene(self.game, self.score))
 
         # Collisions: Spaceship - Enemy Projectile
-        hits = pygame.sprite.spritecollide(self.spaceship, self.enemy_projectiles, True)
+        hits = pygame.sprite.spritecollide(self.spaceship, self.enemy_projectiles, False)
         for hit in hits:
-            self.assets['crash_sound'].play()
-            self.lives -= 1
-            self.spaceship.downgrade()
-            if self.lives == 0:
-                self.game.state_manager.change_scene(GameOverScene(self.game, self.score))
+            if self.spaceship.take_damage():
+                hit.kill()  # Remove projectile only if damage was applied
+                self.assets['crash_sound'].play()
+                self.lives -= 1
+                self.spaceship.downgrade()
+                if self.lives == 0:
+                    self.game.state_manager.change_scene(GameOverScene(self.game, self.score))
 
         # Collisions: Spaceship - Chaser
-        hits = pygame.sprite.spritecollide(self.spaceship, self.chasers, True)
+        hits = pygame.sprite.spritecollide(self.spaceship, self.chasers, False)
         for hit in hits:
-            self.assets['crash_sound'].play()
-            self.lives -= 1
-            self.spaceship.downgrade()
-            if self.lives == 0:
-                self.game.state_manager.change_scene(GameOverScene(self.game, self.score))
+            if self.spaceship.take_damage():
+                hit.kill()  # Remove chaser only if damage was applied
+                self.assets['crash_sound'].play()
+                self.lives -= 1
+                self.spaceship.downgrade()
+                if self.lives == 0:
+                    self.game.state_manager.change_scene(GameOverScene(self.game, self.score))
 
         # Collisions: Spaceship - Shooter
-        hits = pygame.sprite.spritecollide(self.spaceship, self.shooters, True)
+        hits = pygame.sprite.spritecollide(self.spaceship, self.shooters, False)
         for hit in hits:
-            self.assets['crash_sound'].play()
-            self.lives -= 1
-            self.spaceship.downgrade()
-            if self.lives == 0:
-                self.game.state_manager.change_scene(GameOverScene(self.game, self.score))
+            if self.spaceship.take_damage():
+                hit.kill()  # Remove shooter only if damage was applied
+                self.assets['crash_sound'].play()
+                self.lives -= 1
+                self.spaceship.downgrade()
+                if self.lives == 0:
+                    self.game.state_manager.change_scene(GameOverScene(self.game, self.score))
 
         # Collisions: Spaceship - PowerUp
         hits = pygame.sprite.spritecollide(self.spaceship, self.powerups, True)
@@ -354,8 +361,16 @@ class GameScene(Scene):
         # Background
         self.background.draw(screen)
         
-        # Sprites
-        self.all_sprites.draw(screen)
+        # Handle spaceship blinking during invincibility
+        # If spaceship is not visible (blinking), temporarily remove it from drawing
+        if not self.spaceship.visible:
+            # Draw all sprites except spaceship
+            for sprite in self.all_sprites:
+                if sprite != self.spaceship:
+                    screen.blit(sprite.image, sprite.rect)
+        else:
+            # Draw all sprites normally
+            self.all_sprites.draw(screen)
         
         # HUD
         self.hud.draw(screen, self.lives, MAX_LIVES, self.spaceship.available_bullets, MAX_BULLETS, self.score, self.spaceship.level, self.spaceship.missiles, MAX_MISSILES)

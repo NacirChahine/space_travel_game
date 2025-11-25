@@ -28,9 +28,11 @@ def test_hud_rendering():
     max_bullets = 20
     score = 150
     level = 2
+    missiles = 1
+    max_missiles = 3
     
     # Draw the HUD
-    hud.draw(screen, lives, max_lives, available_bullets, max_bullets, score, level)
+    hud.draw(screen, lives, max_lives, available_bullets, max_bullets, score, level, missiles, max_missiles)
     
     # Verify that the HUD instance has the required methods
     assert hasattr(hud, 'draw_glass_bar')

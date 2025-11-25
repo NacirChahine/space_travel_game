@@ -11,7 +11,14 @@ class Spaceship(Entity):
         self.available_bullets = INITIAL_BULLETS
         self.missiles = INITIAL_MISSILES
         self.level = 1
-        self.asset_manager = None 
+        self.asset_manager = None
+        
+        # Invincibility mechanic
+        self.is_invincible = False
+        self.invincibility_start_time = 0
+        self.invincibility_duration = 2000  # 2 seconds in milliseconds
+        self.blink_interval = 100  # Blink every 100ms
+        self.visible = True  # For blinking effect 
         
     def set_assets(self, assets):
         self.assets = assets
@@ -34,16 +41,44 @@ class Spaceship(Entity):
 
     def update(self):
         keys = pygame.key.get_pressed()
+        
+        # Horizontal movement
         if keys[pygame.K_LEFT]:
             self.rect.x -= self.speed
         if keys[pygame.K_RIGHT]:
             self.rect.x += self.speed
+        
+        # Vertical movement (NEW)
+        if keys[pygame.K_UP]:
+            self.rect.y -= self.speed
+        if keys[pygame.K_DOWN]:
+            self.rect.y += self.speed
 
-        # Keep within screen bounds
+        # Keep within screen bounds (horizontal)
         if self.rect.x < 0:
             self.rect.x = 0
         if self.rect.x > SCREEN_WIDTH - SPACESHIP_WIDTH:
             self.rect.x = SCREEN_WIDTH - SPACESHIP_WIDTH
+        
+        # Keep within screen bounds (vertical)
+        if self.rect.y < 0:
+            self.rect.y = 0
+        if self.rect.y > SCREEN_HEIGHT - SPACESHIP_HEIGHT:
+            self.rect.y = SCREEN_HEIGHT - SPACESHIP_HEIGHT
+        
+        # Handle invincibility timer and blinking
+        if self.is_invincible:
+            current_time = pygame.time.get_ticks()
+            elapsed = current_time - self.invincibility_start_time
+            
+            # Check if invincibility period has expired
+            if elapsed >= self.invincibility_duration:
+                self.is_invincible = False
+                self.visible = True  # Ensure spaceship is visible after invincibility
+            else:
+                # Toggle visibility for blinking effect
+                blink_cycle = (elapsed // self.blink_interval) % 2
+                self.visible = (blink_cycle == 0)
 
     def shoot(self, bullet_image):
         if self.available_bullets > 0:
@@ -117,3 +152,17 @@ class Spaceship(Entity):
             self.missiles -= 1
             return True
         return False
+    
+    def take_damage(self):
+        """
+        Activates invincibility when spaceship takes damage.
+        Returns True if damage can be applied (not invincible), False otherwise.
+        """
+        if self.is_invincible:
+            return False  # Cannot take damage while invincible
+        
+        # Activate invincibility
+        self.is_invincible = True
+        self.invincibility_start_time = pygame.time.get_ticks()
+        return True  # Damage can be applied
+

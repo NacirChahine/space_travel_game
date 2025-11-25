@@ -32,10 +32,10 @@ def test_spaceship_movement():
     
 def test_bullet_movement():
     bullet_image = pygame.Surface((BULLET_WIDTH, BULLET_HEIGHT))
-    bullet = Bullet(100, 100, bullet_image)
+    bullet = Bullet(100, 100, bullet_image, vx=0, vy=-10)
     initial_y = bullet.rect.y
     bullet.update()
-    assert bullet.rect.y == initial_y - bullet.speed
+    assert bullet.rect.y == initial_y - 10  # Using default vy=-10
 
 def test_asteroid_movement():
     image = pygame.Surface((ASTEROID_WIDTH, ASTEROID_HEIGHT))

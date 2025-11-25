@@ -179,3 +179,153 @@ def test_multiple_bosses_can_exist():
     assert len(scene.bosses) == 2
     assert first_boss in scene.bosses  # First boss still exists
 
+def test_spaceship_vertical_movement_up():
+    """Test spaceship can move up"""
+    game = MockGame()
+    scene = GameScene(game)
+    
+    initial_y = scene.spaceship.rect.y
+    
+    # Simulate UP key press
+    pygame.key.get_pressed = lambda: {pygame.K_UP: True, pygame.K_DOWN: False, 
+                                       pygame.K_LEFT: False, pygame.K_RIGHT: False}
+    scene.spaceship.update()
+    
+    assert scene.spaceship.rect.y < initial_y
+
+def test_spaceship_vertical_movement_down():
+    """Test spaceship can move down"""
+    game = MockGame()
+    scene = GameScene(game)
+    
+    initial_y = scene.spaceship.rect.y
+    
+    # Simulate DOWN key press
+    pygame.key.get_pressed = lambda: {pygame.K_UP: False, pygame.K_DOWN: True, 
+                                       pygame.K_LEFT: False, pygame.K_RIGHT: False}
+    scene.spaceship.update()
+    
+    assert scene.spaceship.rect.y > initial_y
+
+def test_spaceship_vertical_boundary_top():
+    """Test spaceship cannot move above screen boundary"""
+    game = MockGame()
+    scene = GameScene(game)
+    
+    # Move spaceship to top
+    scene.spaceship.rect.y = 0
+    
+    # Try to move up
+    pygame.key.get_pressed = lambda: {pygame.K_UP: True, pygame.K_DOWN: False, 
+                                       pygame.K_LEFT: False, pygame.K_RIGHT: False}
+    scene.spaceship.update()
+    
+    assert scene.spaceship.rect.y == 0
+
+def test_spaceship_vertical_boundary_bottom():
+    """Test spaceship cannot move below screen boundary"""
+    from src.config import SCREEN_HEIGHT, SPACESHIP_HEIGHT
+    game = MockGame()
+    scene = GameScene(game)
+    
+    # Move spaceship to bottom
+    scene.spaceship.rect.y = SCREEN_HEIGHT - SPACESHIP_HEIGHT
+    
+    # Try to move down
+    pygame.key.get_pressed = lambda: {pygame.K_UP: False, pygame.K_DOWN: True, 
+                                       pygame.K_LEFT: False, pygame.K_RIGHT: False}
+    scene.spaceship.update()
+    
+    assert scene.spaceship.rect.y == SCREEN_HEIGHT - SPACESHIP_HEIGHT
+
+def test_invincibility_activation():
+    """Test that spaceship becomes invincible after taking damage"""
+    game = MockGame()
+    scene = GameScene(game)
+    
+    assert not scene.spaceship.is_invincible
+    
+    # Take damage
+    result = scene.spaceship.take_damage()
+    
+    assert result is True  # Damage was applied
+    assert scene.spaceship.is_invincible
+
+def test_invincibility_prevents_damage():
+    """Test that spaceship cannot take damage while invincible"""
+    game = MockGame()
+    scene = GameScene(game)
+    
+    # First damage activates invincibility
+    result1 = scene.spaceship.take_damage()
+    assert result1 is True
+    assert scene.spaceship.is_invincible
+    
+    # Second damage should be prevented
+    result2 = scene.spaceship.take_damage()
+    assert result2 is False
+
+def test_invincibility_expires():
+    """Test that invincibility expires after 2 seconds"""
+    game = MockGame()
+    scene = GameScene(game)
+    
+    # Activate invincibility
+    scene.spaceship.take_damage()
+    assert scene.spaceship.is_invincible
+    
+    # Mock time advancement (2000ms = 2 seconds)
+    scene.spaceship.invincibility_start_time = pygame.time.get_ticks() - 2000
+    scene.spaceship.update()
+    
+    assert not scene.spaceship.is_invincible
+    assert scene.spaceship.visible is True
+
+def test_invincibility_blinking_effect():
+    """Test that spaceship blinks during invincibility"""
+    game = MockGame()
+    scene = GameScene(game)
+    
+    # Activate invincibility
+    scene.spaceship.take_damage()
+    
+    # Check blinking at different time intervals
+    # At 0ms: visible
+    scene.spaceship.invincibility_start_time = pygame.time.get_ticks()
+    scene.spaceship.update()
+    assert scene.spaceship.visible is True
+    
+    # At 100ms: not visible (first blink)
+    scene.spaceship.invincibility_start_time = pygame.time.get_ticks() - 100
+    scene.spaceship.update()
+    assert scene.spaceship.visible is False
+    
+    # At 200ms: visible
+    scene.spaceship.invincibility_start_time = pygame.time.get_ticks() - 200
+    scene.spaceship.update()
+    assert scene.spaceship.visible is True
+
+def test_collision_with_invincibility():
+    """Test that collision damage is prevented during invincibility"""
+    game = MockGame()
+    scene = GameScene(game)
+    
+    initial_lives = scene.lives
+    
+    # Activate invincibility
+    scene.spaceship.take_damage()
+    scene.lives = initial_lives  # Reset lives for test
+    
+    # Create and add an asteroid
+    from src.entities.asteroid import Asteroid
+    asteroid = Asteroid(game.asset_manager.assets['asteroid_images'][0], 5)
+    asteroid.rect.center = scene.spaceship.rect.center  # Position for collision
+    scene.asteroids.add(asteroid)
+    scene.all_sprites.add(asteroid)
+    
+    # Update to process collision
+    scene.update()
+    
+    # Lives should not decrease because of invincibility
+    assert scene.lives == initial_lives
+
