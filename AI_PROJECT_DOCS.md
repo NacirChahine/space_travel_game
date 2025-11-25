@@ -17,7 +17,11 @@ The project follows a component-based architecture with a scene management syste
 - **Spaceship**: Player character with upgrade levels (1-3) and weapon systems.
 - **Asteroid**: Obstacles with varying sizes and speeds.
 - **Bullet**: Projectiles fired by the spaceship.
-- **PowerUp**: Collectible items (health, ammo, upgrade).
+- **Missile**: Screen-clearing projectiles that dynamically target the viewport center.
+  - **Dynamic Trajectory**: Calculates viewport center on each update, accounting for camera movement
+  - **Movement**: Uses normalized vector math to travel toward the center at constant speed
+  - **Explosion**: Triggers when reaching within 20 pixels of viewport center
+- **PowerUp**: Collectible items (health, ammo, upgrade, missile).
 - **Boss**: Enemy bosses with difficulty tiers and color-coded visual indicators.
   - **Difficulty Tiers**: WEAK (green), MEDIUM (orange), STRONG (red)
   - **Scaling Attributes**: Health (3-20 HP), Projectile Count (2-4)
