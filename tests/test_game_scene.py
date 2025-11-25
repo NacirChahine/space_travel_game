@@ -329,3 +329,74 @@ def test_collision_with_invincibility():
     # Lives should not decrease because of invincibility
     assert scene.lives == initial_lives
 
+def test_spaceship_speed_at_level_1():
+    """Test that spaceship has base speed at level 1"""
+    from src.config import SPACESHIP_BASE_SPEED
+    game = MockGame()
+    scene = GameScene(game)
+    
+    assert scene.spaceship.level == 1
+    assert scene.spaceship.speed == SPACESHIP_BASE_SPEED
+
+def test_spaceship_speed_increases_with_level():
+    """Test that spaceship speed increases when upgrading"""
+    from src.config import SPACESHIP_BASE_SPEED, SPACESHIP_SPEED_PER_LEVEL
+    game = MockGame()
+    scene = GameScene(game)
+    
+    initial_speed = scene.spaceship.speed
+    
+    # Upgrade to level 2
+    scene.spaceship.upgrade()
+    assert scene.spaceship.level == 2
+    expected_speed = SPACESHIP_BASE_SPEED + (2 - 1) * SPACESHIP_SPEED_PER_LEVEL
+    assert scene.spaceship.speed == expected_speed
+    assert scene.spaceship.speed > initial_speed
+
+def test_spaceship_speed_decreases_with_downgrade():
+    """Test that spaceship speed decreases when downgrading"""
+    game = MockGame()
+    scene = GameScene(game)
+    
+    # Upgrade to level 3
+    scene.spaceship.upgrade()
+    scene.spaceship.upgrade()
+    level_3_speed = scene.spaceship.speed
+    
+    # Downgrade to level 2
+    scene.spaceship.downgrade()
+    assert scene.spaceship.level == 2
+    assert scene.spaceship.speed < level_3_speed
+
+def test_spaceship_speed_at_max_level():
+    """Test that spaceship has maximum speed at level 5"""
+    from src.config import SPACESHIP_BASE_SPEED, SPACESHIP_SPEED_PER_LEVEL, SPACESHIP_LEVEL_MAX
+    game = MockGame()
+    scene = GameScene(game)
+    
+    # Upgrade to max level
+    while scene.spaceship.level < SPACESHIP_LEVEL_MAX:
+        scene.spaceship.upgrade()
+    
+    assert scene.spaceship.level == SPACESHIP_LEVEL_MAX
+    expected_max_speed = SPACESHIP_BASE_SPEED + (SPACESHIP_LEVEL_MAX - 1) * SPACESHIP_SPEED_PER_LEVEL
+    assert scene.spaceship.speed == expected_max_speed
+
+def test_spaceship_speed_progression():
+    """Test speed progression through all levels"""
+    from src.config import SPACESHIP_BASE_SPEED, SPACESHIP_SPEED_PER_LEVEL
+    game = MockGame()
+    scene = GameScene(game)
+    
+    # Test progression: Level 1 -> 2 -> 3 -> 4 -> 5
+    expected_speeds = [
+        SPACESHIP_BASE_SPEED + (i - 1) * SPACESHIP_SPEED_PER_LEVEL 
+        for i in range(1, 6)
+    ]
+    
+    for i, expected_speed in enumerate(expected_speeds, start=1):
+        assert scene.spaceship.level == i
+        assert scene.spaceship.speed == expected_speed
+        if i < 5:
+            scene.spaceship.upgrade()
+

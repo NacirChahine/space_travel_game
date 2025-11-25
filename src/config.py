@@ -3,7 +3,7 @@ import os
 # Game Version
 # Update this version number when game mechanics or difficulty changes
 # Each version maintains its own separate leaderboard
-GAME_VERSION = "3.1.2"
+GAME_VERSION = "3.2.1"
 
 # Screen settings
 SCREEN_WIDTH = 1600
@@ -55,6 +55,10 @@ POWERUP_SPAWN_EVENT = 0   # Will be set in pygame setup
 SPACESHIP_LEVEL_MAX = 5
 MISSILE_POWERUP_CHANCE = 0.1 # 10% chance when a powerup spawns
 UPGRADE_DURATION = 0 # Permanent until hit? Or temporary? Request implies permanent until hit.
+
+# Spaceship Speed Scaling
+SPACESHIP_BASE_SPEED = 5  # Base speed at level 1
+SPACESHIP_SPEED_PER_LEVEL = 0.5  # Speed increase per level (5, 5.5, 6, 6.5, 7)
 
 # Boss
 BOSS_HEALTH_INITIAL = 5

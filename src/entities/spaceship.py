@@ -5,13 +5,15 @@ from src.config import *
 class Spaceship(Entity):
     def __init__(self, x, y, image, sound):
         super().__init__(x, y, image)
-        self.speed = 5
         self.fire_sound = sound
         self.bullets = pygame.sprite.Group()
         self.available_bullets = INITIAL_BULLETS
         self.missiles = INITIAL_MISSILES
         self.level = 1
         self.asset_manager = None
+        
+        # Speed scaling based on level
+        self.update_speed()
         
         # Invincibility mechanic
         self.is_invincible = False
@@ -20,6 +22,10 @@ class Spaceship(Entity):
         self.blink_interval = 100  # Blink every 100ms
         self.visible = True  # For blinking effect 
         
+    def update_speed(self):
+        """Update speed based on current level."""
+        self.speed = SPACESHIP_BASE_SPEED + (self.level - 1) * SPACESHIP_SPEED_PER_LEVEL
+    
     def set_assets(self, assets):
         self.assets = assets
         self.update_image()
@@ -132,11 +138,13 @@ class Spaceship(Entity):
         if self.level < SPACESHIP_LEVEL_MAX:
             self.level += 1
             self.update_image()
+            self.update_speed()  # Update speed when leveling up
 
     def downgrade(self):
         if self.level > 1:
             self.level -= 1
             self.update_image()
+            self.update_speed()  # Update speed when leveling down
 
     def add_bullets(self, amount):
         self.available_bullets = min(MAX_BULLETS, self.available_bullets + amount)
