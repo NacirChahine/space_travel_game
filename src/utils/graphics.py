@@ -15,9 +15,17 @@ class GraphicsGenerator:
         elif level == 2:
             hull_color = (150, 150, 255)
             engine_color = (255, 50, 0)
-        else: # Level 3
+        elif level == 3:
             hull_color = (100, 100, 255)
             engine_color = (255, 0, 0)
+        elif level == 4:
+            # Advanced sleek design with purple tones
+            hull_color = (150, 100, 255)
+            engine_color = (0, 255, 255)  # Cyan engine
+        else:  # Level 5
+            # Elite design with deep purple and gold accents
+            hull_color = (100, 50, 200)
+            engine_color = (255, 215, 0)  # Gold engine
             
         cockpit_color = (0, 255, 255)
         detail_color = (100, 100, 150)
@@ -44,6 +52,26 @@ class GraphicsGenerator:
             # Extra cannons
             pygame.draw.rect(surface, detail_color, (center_x - 15, height - 15, 4, 15))
             pygame.draw.rect(surface, detail_color, (center_x + 11, height - 15, 4, 15))
+        
+        if level >= 4:
+            # Advanced armor plating (hexagonal patterns)
+            armor_color = (180, 150, 255) if level == 4 else (150, 100, 255)
+            pygame.draw.polygon(surface, armor_color, [(center_x - 8, 15), (center_x + 8, 15), (center_x + 12, 25), (center_x + 8, 35), (center_x - 8, 35), (center_x - 12, 25)])
+            # Shield emitters on wings
+            pygame.draw.circle(surface, (100, 200, 255), (8, height - 25), 4)
+            pygame.draw.circle(surface, (100, 200, 255), (width - 8, height - 25), 4)
+            
+        if level >= 5:
+            # Elite features: Energy cores
+            core_color = (255, 215, 0)
+            pygame.draw.circle(surface, core_color, (center_x - 10, height // 2), 3)
+            pygame.draw.circle(surface, core_color, (center_x + 10, height // 2), 3)
+            # Advanced wing structure
+            pygame.draw.polygon(surface, hull_color, [(5, height - 30), (0, height - 10), (15, height - 20)])
+            pygame.draw.polygon(surface, hull_color, [(width - 5, height - 30), (width, height - 10), (width - 15, height - 20)])
+            # Extra detail lines
+            pygame.draw.line(surface, (200, 150, 255), (center_x - 5, 20), (center_x - 5, height - 30), 1)
+            pygame.draw.line(surface, (200, 150, 255), (center_x + 5, 20), (center_x + 5, height - 30), 1)
 
         # Cockpit
         cockpit_rect = pygame.Rect(center_x - 5, height // 2 - 10, 10, 15)
@@ -53,9 +81,20 @@ class GraphicsGenerator:
         pygame.draw.line(surface, detail_color, (center_x, 10), (10, height - 5), 2)
         pygame.draw.line(surface, detail_color, (center_x, 10), (width - 10, height - 5), 2)
         
-        # Engine Glow
-        engine_rect = pygame.Rect(center_x - 8, height - 8, 16, 8)
-        pygame.draw.ellipse(surface, engine_color, engine_rect)
+        # Engine Glow (varies by level)
+        if level == 4:
+            # Dual engine configuration
+            pygame.draw.ellipse(surface, engine_color, (center_x - 10, height - 8, 8, 8))
+            pygame.draw.ellipse(surface, engine_color, (center_x + 2, height - 8, 8, 8))
+        elif level == 5:
+            # Triple engine configuration
+            pygame.draw.ellipse(surface, engine_color, (center_x - 12, height - 8, 7, 8))
+            pygame.draw.ellipse(surface, engine_color, (center_x - 3, height - 8, 7, 8))
+            pygame.draw.ellipse(surface, engine_color, (center_x + 6, height - 8, 7, 8))
+        else:
+            # Single engine for levels 1-3
+            engine_rect = pygame.Rect(center_x - 8, height - 8, 16, 8)
+            pygame.draw.ellipse(surface, engine_color, engine_rect)
         
         return surface
 

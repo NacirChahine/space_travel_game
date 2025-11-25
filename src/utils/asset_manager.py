@@ -31,8 +31,8 @@ class AssetManager:
             1: GraphicsGenerator.draw_spaceship(SPACESHIP_WIDTH, SPACESHIP_HEIGHT, 1),
             2: GraphicsGenerator.draw_spaceship(SPACESHIP_WIDTH, SPACESHIP_HEIGHT, 2),
             3: GraphicsGenerator.draw_spaceship(SPACESHIP_WIDTH, SPACESHIP_HEIGHT, 3),
-            4: GraphicsGenerator.draw_spaceship(SPACESHIP_WIDTH, SPACESHIP_HEIGHT, 3), # Reuse level 3 for now
-            5: GraphicsGenerator.draw_spaceship(SPACESHIP_WIDTH, SPACESHIP_HEIGHT, 3)  # Reuse level 3 for now
+            4: GraphicsGenerator.draw_spaceship(SPACESHIP_WIDTH, SPACESHIP_HEIGHT, 4),
+            5: GraphicsGenerator.draw_spaceship(SPACESHIP_WIDTH, SPACESHIP_HEIGHT, 5)
         }
         self.assets['spaceship_img'] = self.assets['spaceship_levels'][1] # Default
 

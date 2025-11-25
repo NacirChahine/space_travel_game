@@ -14,7 +14,12 @@ The project follows a component-based architecture with a scene management syste
 
 ### Entities
 - **Entity**: Base class for all game objects.
-- **Spaceship**: Player character with upgrade levels (1-3) and weapon systems.
+- **Spaceship**: Player character with upgrade levels (1-5) and weapon systems.
+  - **Level 1**: Light blue hull, single orange engine
+  - **Level 2**: Medium blue hull, enhanced side wings, single red engine
+  - **Level 3**: Deep blue hull, extra cannons, single bright red engine
+  - **Level 4**: Purple hull, hexagonal armor plating, shield emitters, dual cyan engines
+  - **Level 5**: Elite deep purple/gold hull, energy cores, advanced wing structure, triple gold engines
 - **Asteroid**: Obstacles with varying sizes and speeds.
 - **Bullet**: Projectiles fired by the spaceship.
 - **Missile**: Screen-clearing projectiles that dynamically target the viewport center.
@@ -43,7 +48,7 @@ The project follows a component-based architecture with a scene management syste
   - **HUD**: Glassmorphic UI with real-time numeric displays inside the progress bars:
     - Health: current/max (e.g., "3/5") - centered inside health bar
     - Ammo: current/max (e.g., "12/20") - centered inside ammo bar
-    - Ship Level: current/max (e.g., "2/3") - centered inside level bar
+    - Ship Level: current/max (e.g., "2/5") - centered inside level bar
 - **GameOverScene**: End screen with high scores.
 
 ## Development
