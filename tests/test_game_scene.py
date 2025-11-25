@@ -2,7 +2,7 @@ import pygame
 import pytest
 from unittest.mock import MagicMock, Mock
 from src.scenes.game_scene import GameScene
-from src.config import BOSS_SPAWN_SCORE
+from src.config import BOSS_SPAWN_SCORE_INITIAL, BOSS_SPAWN_GAP_INITIAL, BOSS_SPAWN_GAP_DECREASE, BOSS_SPAWN_GAP_MIN, LEVEL_SCORE_THRESHOLD
 
 # Mock pygame
 pygame.init()
@@ -26,11 +26,16 @@ class MockGame:
             'health_powerup_img': mock_surface,
             'ammo_powerup_img': mock_surface,
             'upgrade_powerup_img': mock_surface,
+            'chaser_img': mock_surface,
+            'shooter_img': mock_surface,
+            'missile_img': mock_surface,
+            'missile_powerup_img': mock_surface,
             'asteroid_images': [mock_surface, mock_surface],
             'fire_sound': mock_sound,
             'asteroid_hit_sound': mock_sound,
             'crash_sound': mock_sound,
             'end_bomb_sound': mock_sound,
+            'missile_launch_sound': mock_sound,
             'spaceship_levels': {
                 1: mock_surface,
                 2: mock_surface,
@@ -38,68 +43,71 @@ class MockGame:
             }
         }
 
-def test_boss_spawn_at_score_200():
-    """Test that boss spawns when score reaches 200"""
+def test_boss_spawn_at_initial_score():
+    """Test that boss spawns when score reaches initial threshold"""
     game = MockGame()
     scene = GameScene(game)
     
     # Initially no bosses
     assert len(scene.bosses) == 0
-    assert scene.next_boss_score == BOSS_SPAWN_SCORE  # Should be 200
+    assert scene.next_boss_score == BOSS_SPAWN_SCORE_INITIAL
     
-    # Set score to 199, no boss should spawn
-    scene.score = 199
+    # Set score just below threshold
+    scene.score = BOSS_SPAWN_SCORE_INITIAL - 1
     scene.update()
     assert len(scene.bosses) == 0
     
-    # Set score to 200, boss should spawn
-    scene.score = 200
+    # Set score to threshold
+    scene.score = BOSS_SPAWN_SCORE_INITIAL
     scene.update()
     assert len(scene.bosses) == 1
-    assert scene.next_boss_score == 400  # Next boss at 400
+    
+    # Calculate expected next score
+    level = (BOSS_SPAWN_SCORE_INITIAL // LEVEL_SCORE_THRESHOLD) + 1
+    gap = max(BOSS_SPAWN_GAP_MIN, BOSS_SPAWN_GAP_INITIAL - (level * BOSS_SPAWN_GAP_DECREASE))
+    expected_next = BOSS_SPAWN_SCORE_INITIAL + gap
+    
+    assert scene.next_boss_score == expected_next
 
-def test_boss_spawn_at_multiple_thresholds():
-    """Test that bosses spawn at correct score milestones (200, 400, 600, etc.)"""
+def test_boss_spawn_progressive():
+    """Test that bosses spawn at progressively calculated thresholds"""
     game = MockGame()
     scene = GameScene(game)
     
-    # Score 200 - first boss
-    scene.score = 200
+    current_score = BOSS_SPAWN_SCORE_INITIAL
+    
+    # First boss
+    scene.score = current_score
     scene.update()
     assert len(scene.bosses) == 1
-    assert scene.next_boss_score == 400
     
-    # Score 350 - no new boss
-    scene.score = 350
-    scene.update()
-    assert len(scene.bosses) == 1
-    assert scene.next_boss_score == 400
+    # Calculate next
+    level = (current_score // LEVEL_SCORE_THRESHOLD) + 1
+    gap = max(BOSS_SPAWN_GAP_MIN, BOSS_SPAWN_GAP_INITIAL - (level * BOSS_SPAWN_GAP_DECREASE))
+    next_score = current_score + gap
     
-    # Score 400 - second boss
-    scene.score = 400
+    assert scene.next_boss_score == next_score
+    
+    # Second boss
+    scene.score = next_score
     scene.update()
     assert len(scene.bosses) == 2
-    assert scene.next_boss_score == 600
     
-    # Score 600 - third boss
-    scene.score = 600
-    scene.update()
-    assert len(scene.bosses) == 3
-    assert scene.next_boss_score == 800
+    # Calculate next again
+    current_score = next_score
+    level = (current_score // LEVEL_SCORE_THRESHOLD) + 1
+    gap = max(BOSS_SPAWN_GAP_MIN, BOSS_SPAWN_GAP_INITIAL - (level * BOSS_SPAWN_GAP_DECREASE))
+    next_score = current_score + gap
     
-    # Score 800 - fourth boss
-    scene.score = 800
-    scene.update()
-    assert len(scene.bosses) == 4
-    assert scene.next_boss_score == 1000
+    assert scene.next_boss_score == next_score
 
 def test_no_boss_before_threshold():
     """Test that no boss spawns before reaching first threshold"""
     game = MockGame()
     scene = GameScene(game)
     
-    # Test various scores below 200
-    for score in [0, 50, 100, 150, 199]:
+    # Test various scores below initial threshold
+    for score in [0, 50, 100, BOSS_SPAWN_SCORE_INITIAL - 1]:
         scene.score = score
         scene.update()
         assert len(scene.bosses) == 0, f"Boss should not spawn at score {score}"
@@ -109,15 +117,35 @@ def test_boss_spawn_with_score_jump():
     game = MockGame()
     scene = GameScene(game)
     
-    # Jump from 190 to 210 (skipping 200)
-    scene.score = 190
-    scene.update()
-    assert len(scene.bosses) == 0
-    
-    scene.score = 210
+    # Jump over threshold
+    scene.score = BOSS_SPAWN_SCORE_INITIAL + 10
     scene.update()
     assert len(scene.bosses) == 1
-    assert scene.next_boss_score == 400
+    
+    # Next score should be set correctly relative to the *previous* threshold logic
+    # Note: The code adds gap to the *previous* next_boss_score, not current score.
+    # So next_boss_score should be BOSS_SPAWN_SCORE_INITIAL + gap
+    
+    level = (scene.score // LEVEL_SCORE_THRESHOLD) + 1
+    # Wait, the code uses self.level which is updated in update()
+    # Let's check if level is updated before or after boss spawn?
+    # In update(): Boss spawn is BEFORE Level Up check.
+    # So self.level is still 1 (or whatever it was initialized/updated to previously).
+    # But wait, self.level is updated at the end of update().
+    # So for the FIRST boss spawn, self.level is likely 1 (initialized in __init__).
+    
+    # Let's re-verify the logic in GameScene.update()
+    # Boss spawn uses self.level.
+    # Level update is at the end.
+    # So if we set score manually, self.level might be stale if we don't update it.
+    # But in the test we just set scene.score.
+    # scene.level is 1 by default.
+    
+    # So gap calculation uses level=1.
+    gap = max(BOSS_SPAWN_GAP_MIN, BOSS_SPAWN_GAP_INITIAL - (1 * BOSS_SPAWN_GAP_DECREASE))
+    # gap = 400 - 10 = 390.
+    
+    assert scene.next_boss_score == BOSS_SPAWN_SCORE_INITIAL + gap
 
 def test_multiple_bosses_can_exist():
     """Test that multiple bosses can exist simultaneously"""
@@ -125,12 +153,13 @@ def test_multiple_bosses_can_exist():
     scene = GameScene(game)
     
     # Spawn first boss
-    scene.score = 200
+    scene.score = BOSS_SPAWN_SCORE_INITIAL
     scene.update()
     first_boss = list(scene.bosses)[0]
     
-    # Spawn second boss without killing first
-    scene.score = 400
+    # Force spawn second boss
+    scene.score = scene.next_boss_score
     scene.update()
     assert len(scene.bosses) == 2
     assert first_boss in scene.bosses  # First boss still exists
+

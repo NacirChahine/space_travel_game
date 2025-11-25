@@ -28,7 +28,7 @@ class GameScene(Scene):
         self.level = 1
         self.level = 1
         self.asteroid_spawn_rate = ASTEROID_SPAWN_RATE_INITIAL
-        self.next_boss_score = BOSS_SPAWN_SCORE
+        self.next_boss_score = BOSS_SPAWN_SCORE_INITIAL
         
         # Background
         self.background = Background()
@@ -161,12 +161,14 @@ class GameScene(Scene):
                         self.assets['enemy_projectile_img'], difficulty_tier)
              self.bosses.add(boss)
              self.all_sprites.add(boss)
-             self.next_boss_score += BOSS_SPAWN_SCORE
+             gap = max(BOSS_SPAWN_GAP_MIN, BOSS_SPAWN_GAP_INITIAL - (self.level * BOSS_SPAWN_GAP_DECREASE))
+             self.next_boss_score += gap
 
         # Spawn Chasers
         if self.score >= CHASER_START_SCORE:
             # Spawn chance increases with score/level
-            if random.random() < 0.005 + (self.level * 0.001): # Small chance per frame
+            chance = CHASER_SPAWN_CHANCE_BASE + (self.level * CHASER_SPAWN_CHANCE_INC)
+            if random.random() < chance:
                 x = random.randint(0, SCREEN_WIDTH - CHASER_WIDTH)
                 chaser = Chaser(x, -CHASER_HEIGHT, self.assets['chaser_img'], self.spaceship)
                 self.chasers.add(chaser)
@@ -174,7 +176,8 @@ class GameScene(Scene):
 
         # Spawn Shooters
         if self.score >= SHOOTER_START_SCORE:
-             if random.random() < 0.003 + (self.level * 0.001):
+            chance = SHOOTER_SPAWN_CHANCE_BASE + (self.level * SHOOTER_SPAWN_CHANCE_INC)
+            if random.random() < chance:
                 x = random.randint(0, SCREEN_WIDTH - SHOOTER_WIDTH)
                 shooter = Shooter(x, -SHOOTER_HEIGHT, self.assets['shooter_img'], self.assets['enemy_projectile_img'])
                 self.shooters.add(shooter)

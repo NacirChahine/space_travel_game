@@ -81,6 +81,19 @@ SHOOTER_SCORE_VALUE = 40
 CHASER_START_SCORE = 500
 SHOOTER_START_SCORE = 1000
 
+# Spawn Rates (Chance per frame)
+CHASER_SPAWN_CHANCE_BASE = 0.001
+CHASER_SPAWN_CHANCE_INC = 0.0002
+
+SHOOTER_SPAWN_CHANCE_BASE = 0.0005
+SHOOTER_SPAWN_CHANCE_INC = 0.0001
+
+# Boss Spawning
+BOSS_SPAWN_SCORE_INITIAL = 400
+BOSS_SPAWN_GAP_INITIAL = 400
+BOSS_SPAWN_GAP_MIN = 200
+BOSS_SPAWN_GAP_DECREASE = 10
+
 # Boss Difficulty Tiers
 # Difficulty is determined by health and projectile count
 # Colors provide visual indicators for difficulty
