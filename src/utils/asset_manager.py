@@ -120,6 +120,10 @@ class AssetManager:
         self.assets['boss_img'] = GraphicsGenerator.draw_boss(BOSS_WIDTH, BOSS_HEIGHT)
         self.assets['enemy_projectile_img'] = GraphicsGenerator.draw_enemy_projectile(10, 10)
 
+        # Generate New Enemies
+        self.assets['chaser_img'] = GraphicsGenerator.draw_chaser(CHASER_WIDTH, CHASER_HEIGHT)
+        self.assets['shooter_img'] = GraphicsGenerator.draw_shooter(SHOOTER_WIDTH, SHOOTER_HEIGHT)
+
         # Load sounds
         pygame.mixer.init()
         try:

@@ -7,6 +7,8 @@ from src.entities.asteroid import Asteroid
 from src.entities.bullet import Bullet
 from src.entities.powerup import PowerUp
 from src.entities.boss import Boss
+from src.entities.chaser import Chaser
+from src.entities.shooter import Shooter
 from src.entities.missile import Missile
 from src.entities.explosion import Explosion
 from src.ui.hud import HUD
@@ -44,6 +46,8 @@ class GameScene(Scene):
         self.bullets = pygame.sprite.Group()
         self.powerups = pygame.sprite.Group()
         self.bosses = pygame.sprite.Group()
+        self.chasers = pygame.sprite.Group()
+        self.shooters = pygame.sprite.Group()
         self.missiles_group = pygame.sprite.Group()
         self.explosions = pygame.sprite.Group()
         self.enemy_projectiles = pygame.sprite.Group()
@@ -159,12 +163,31 @@ class GameScene(Scene):
              self.all_sprites.add(boss)
              self.next_boss_score += BOSS_SPAWN_SCORE
 
+        # Spawn Chasers
+        if self.score >= CHASER_START_SCORE:
+            # Spawn chance increases with score/level
+            if random.random() < 0.005 + (self.level * 0.001): # Small chance per frame
+                x = random.randint(0, SCREEN_WIDTH - CHASER_WIDTH)
+                chaser = Chaser(x, -CHASER_HEIGHT, self.assets['chaser_img'], self.spaceship)
+                self.chasers.add(chaser)
+                self.all_sprites.add(chaser)
+
+        # Spawn Shooters
+        if self.score >= SHOOTER_START_SCORE:
+             if random.random() < 0.003 + (self.level * 0.001):
+                x = random.randint(0, SCREEN_WIDTH - SHOOTER_WIDTH)
+                shooter = Shooter(x, -SHOOTER_HEIGHT, self.assets['shooter_img'], self.assets['enemy_projectile_img'])
+                self.shooters.add(shooter)
+                self.all_sprites.add(shooter)
+
         # Update all sprites
         self.spaceship.update() # Handle input movement
         self.bullets.update()
         self.asteroids.update()
         self.powerups.update()
         self.bosses.update()
+        self.chasers.update()
+        self.shooters.update()
         self.missiles_group.update()
         self.explosions.update()
         self.enemy_projectiles.update()
@@ -179,6 +202,12 @@ class GameScene(Scene):
                 for boss in self.bosses:
                     boss.kill()
                     self.score += 100
+                for chaser in self.chasers:
+                    chaser.kill()
+                    self.score += CHASER_SCORE_VALUE
+                for shooter in self.shooters:
+                    shooter.kill()
+                    self.score += SHOOTER_SCORE_VALUE
                 for projectile in self.enemy_projectiles:
                     projectile.kill()
                 
@@ -202,6 +231,13 @@ class GameScene(Scene):
             # We can just add them.
             pass
 
+        # Add new projectiles from shooters
+        for shooter in self.shooters:
+            for projectile in shooter.projectiles:
+                if projectile not in self.enemy_projectiles:
+                    self.enemy_projectiles.add(projectile)
+                    self.all_sprites.add(projectile)
+
         # Collisions: Bullet - Asteroid
         hits = pygame.sprite.groupcollide(self.asteroids, self.bullets, True, True)
         for hit in hits:
@@ -218,6 +254,24 @@ class GameScene(Scene):
                     boss.kill()
                     self.score += 50
                     self.assets['end_bomb_sound'].play() # Reuse sound for boss death
+
+        # Collisions: Bullet - Chaser
+        hits = pygame.sprite.groupcollide(self.chasers, self.bullets, False, True)
+        for chaser, bullets in hits.items():
+            self.assets['asteroid_hit_sound'].play()
+            for b in bullets:
+                if chaser.take_damage():
+                    chaser.kill()
+                    self.score += CHASER_SCORE_VALUE
+
+        # Collisions: Bullet - Shooter
+        hits = pygame.sprite.groupcollide(self.shooters, self.bullets, False, True)
+        for shooter, bullets in hits.items():
+            self.assets['asteroid_hit_sound'].play()
+            for b in bullets:
+                if shooter.take_damage():
+                    shooter.kill()
+                    self.score += SHOOTER_SCORE_VALUE
 
         # Collisions: Spaceship - Asteroid
         hits = pygame.sprite.spritecollide(self.spaceship, self.asteroids, True)
@@ -241,6 +295,24 @@ class GameScene(Scene):
 
         # Collisions: Spaceship - Enemy Projectile
         hits = pygame.sprite.spritecollide(self.spaceship, self.enemy_projectiles, True)
+        for hit in hits:
+            self.assets['crash_sound'].play()
+            self.lives -= 1
+            self.spaceship.downgrade()
+            if self.lives == 0:
+                self.game.state_manager.change_scene(GameOverScene(self.game, self.score))
+
+        # Collisions: Spaceship - Chaser
+        hits = pygame.sprite.spritecollide(self.spaceship, self.chasers, True)
+        for hit in hits:
+            self.assets['crash_sound'].play()
+            self.lives -= 1
+            self.spaceship.downgrade()
+            if self.lives == 0:
+                self.game.state_manager.change_scene(GameOverScene(self.game, self.score))
+
+        # Collisions: Spaceship - Shooter
+        hits = pygame.sprite.spritecollide(self.spaceship, self.shooters, True)
         for hit in hits:
             self.assets['crash_sound'].play()
             self.lives -= 1

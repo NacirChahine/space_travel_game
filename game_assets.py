@@ -114,6 +114,24 @@ def load_assets():
     # Spaceship Levels (Reuse image but maybe add glow or something? For now just reuse)
     assets['spaceship_levels'] = [assets['spaceship_img']] * 6 # 0-5
 
+    # Chaser Enemy Asset (Purple Triangle pointing down)
+    chaser_surf = pygame.Surface((40, 40), pygame.SRCALPHA)
+    pygame.draw.polygon(chaser_surf, (150, 50, 200), [(0, 0), (40, 0), (20, 40)])
+    pygame.draw.polygon(chaser_surf, (200, 100, 255), [(10, 5), (30, 5), (20, 30)]) # Inner detail
+    assets['chaser_img'] = chaser_surf
+
+    # Shooter Enemy Asset (Blue Square with gun barrel)
+    shooter_surf = pygame.Surface((45, 45), pygame.SRCALPHA)
+    pygame.draw.rect(shooter_surf, (50, 100, 200), (0, 0, 45, 35), border_radius=5) # Body
+    pygame.draw.rect(shooter_surf, (100, 150, 255), (5, 5, 35, 25), border_radius=3) # Inner detail
+    pygame.draw.rect(shooter_surf, (80, 80, 80), (18, 35, 9, 10)) # Gun barrel
+    assets['shooter_img'] = shooter_surf
+    
+    # Enemy Projectile (Red/Orange small circle)
+    enemy_proj_surf = pygame.Surface((10, 10), pygame.SRCALPHA)
+    pygame.draw.circle(enemy_proj_surf, (255, 100, 50), (5, 5), 5)
+    assets['enemy_projectile_img'] = enemy_proj_surf
+
     return assets
 
 

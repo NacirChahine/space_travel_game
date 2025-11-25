@@ -3,7 +3,7 @@ import os
 # Game Version
 # Update this version number when game mechanics or difficulty changes
 # Each version maintains its own separate leaderboard
-GAME_VERSION = "3.1.1"
+GAME_VERSION = "3.1.2"
 
 # Screen settings
 SCREEN_WIDTH = 1600
@@ -62,6 +62,24 @@ BOSS_SPAWN_SCORE = 200 # Score to spawn bosses (every 200 points)
 BOSS_WIDTH = 80
 BOSS_HEIGHT = 80
 BOSS_PROJECTILE_SPEED = 7
+
+# New Enemies
+CHASER_SPEED = 4
+CHASER_HEALTH = 2
+CHASER_WIDTH = 40
+CHASER_HEIGHT = 40
+CHASER_SCORE_VALUE = 30
+
+SHOOTER_SPEED = 2
+SHOOTER_HEALTH = 3
+SHOOTER_WIDTH = 45
+SHOOTER_HEIGHT = 45
+SHOOTER_FIRE_RATE = 2000 # ms
+SHOOTER_SCORE_VALUE = 40
+
+# Enemy Spawning
+CHASER_START_SCORE = 500
+SHOOTER_START_SCORE = 1000
 
 # Boss Difficulty Tiers
 # Difficulty is determined by health and projectile count

@@ -196,6 +196,23 @@ class GraphicsGenerator:
         pygame.draw.circle(surface, (255, 0, 0), (width // 2, height // 2), width // 2)
         pygame.draw.circle(surface, (255, 255, 0), (width // 2, height // 2), width // 4)
         return surface
+
+    @staticmethod
+    def draw_chaser(width, height):
+        surface = pygame.Surface((width, height), pygame.SRCALPHA)
+        # Purple Triangle pointing down
+        pygame.draw.polygon(surface, (150, 50, 200), [(0, 0), (width, 0), (width // 2, height)])
+        pygame.draw.polygon(surface, (200, 100, 255), [(width // 4, 5), (width * 3 // 4, 5), (width // 2, height - 10)]) # Inner detail
+        return surface
+
+    @staticmethod
+    def draw_shooter(width, height):
+        surface = pygame.Surface((width, height), pygame.SRCALPHA)
+        # Blue Square with gun barrel
+        pygame.draw.rect(surface, (50, 100, 200), (0, 0, width, height - 10), border_radius=5) # Body
+        pygame.draw.rect(surface, (100, 150, 255), (5, 5, width - 10, height - 20), border_radius=3) # Inner detail
+        pygame.draw.rect(surface, (80, 80, 80), (width // 2 - 4, height - 10, 8, 10)) # Gun barrel
+        return surface
     
     @staticmethod
     def draw_star(size, brightness):
