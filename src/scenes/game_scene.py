@@ -71,7 +71,7 @@ class GameScene(Scene):
                         missile = Missile(self.spaceship.rect.centerx, self.spaceship.rect.y, self.assets['missile_img'])
                         self.missiles_group.add(missile)
                         self.all_sprites.add(missile)
-                        self.assets['fire_sound'].play() # Launch sound
+                        self.assets['missile_launch_sound'].play() # Launch sound
 
 
                 if not self.paused:
@@ -184,8 +184,8 @@ class GameScene(Scene):
                 
                 self.assets['end_bomb_sound'].play()
                 
-                # Spawn Explosion
-                explosion = Explosion(missile.rect.centerx, missile.rect.centery, self.assets['explosion_frames'])
+                # Spawn Fullscreen Explosion (centered at viewport)
+                explosion = Explosion(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2, self.assets['missile_explosion_frames'])
                 self.explosions.add(explosion)
                 self.all_sprites.add(explosion)
                 

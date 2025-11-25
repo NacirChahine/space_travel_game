@@ -70,6 +70,51 @@ class AssetManager:
             self.assets['explosion_frames'].append(
                 GraphicsGenerator.draw_explosion_frame(radius, color_core, color_outer)
             )
+        
+        # Generate Fullscreen Missile Explosion Frames
+        self.assets['missile_explosion_frames'] = []
+        for i in range(15):
+            # Create a fullscreen surface
+            explosion_surface = pygame.Surface((SCREEN_WIDTH, SCREEN_HEIGHT), pygame.SRCALPHA)
+            
+            # Calculate alpha for fade in/out effect
+            if i < 5:
+                # Fade in quickly
+                alpha = int((i / 5) * 180)
+            else:
+                # Fade out gradually
+                alpha = max(0, int(180 - ((i - 5) / 10) * 180))
+            
+            # Draw multiple expanding rings from center
+            center_x = SCREEN_WIDTH // 2
+            center_y = SCREEN_HEIGHT // 2
+            
+            # Create pulsing wave effect
+            for j in range(3):
+                ring_progress = (i + j * 3) / 18.0
+                if ring_progress <= 1.0:
+                    ring_radius = int(ring_progress * max(SCREEN_WIDTH, SCREEN_HEIGHT) * 1.5)
+                    ring_alpha = int(alpha * (1.0 - ring_progress))
+                    
+                    # Outer ring (orange)
+                    pygame.draw.circle(explosion_surface, (255, 150, 0, ring_alpha), 
+                                     (center_x, center_y), ring_radius, 
+                                     max(1, int(30 * (1.0 - ring_progress))))
+                    
+                    # Inner ring (bright yellow/white)
+                    if ring_radius > 20:
+                        pygame.draw.circle(explosion_surface, (255, 255, 200, ring_alpha), 
+                                         (center_x, center_y), ring_radius - 15, 
+                                         max(1, int(20 * (1.0 - ring_progress))))
+            
+            # Add flash overlay at the beginning
+            if i < 3:
+                flash_alpha = int((1.0 - i/3) * 100)
+                flash_overlay = pygame.Surface((SCREEN_WIDTH, SCREEN_HEIGHT), pygame.SRCALPHA)
+                flash_overlay.fill((255, 255, 255, flash_alpha))
+                explosion_surface.blit(flash_overlay, (0, 0))
+            
+            self.assets['missile_explosion_frames'].append(explosion_surface)
 
         # Generate Boss
         self.assets['boss_img'] = GraphicsGenerator.draw_boss(BOSS_WIDTH, BOSS_HEIGHT)
@@ -82,6 +127,7 @@ class AssetManager:
             self.assets['asteroid_hit_sound'] = pygame.mixer.Sound(resource_path('asteroid_hit.wav'))
             self.assets['crash_sound'] = pygame.mixer.Sound(resource_path('crash.wav'))
             self.assets['end_bomb_sound'] = pygame.mixer.Sound(resource_path('end_bomb.wav'))
+            self.assets['missile_launch_sound'] = pygame.mixer.Sound(resource_path('missile.wav'))
             self.music_path = resource_path('drive-breakbeat.mp3')
         except:
             print("Warning: Sound files not found. Running without sound.")
@@ -91,6 +137,7 @@ class AssetManager:
             self.assets['asteroid_hit_sound'] = dummy_sound
             self.assets['crash_sound'] = dummy_sound
             self.assets['end_bomb_sound'] = dummy_sound
+            self.assets['missile_launch_sound'] = dummy_sound
             self.music_path = None
 
         # Create Power-up Assets

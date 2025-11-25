@@ -8,6 +8,9 @@ A retro-style space shooter game built with Pygame.
 - **Spaceship Upgrades**: Level up your spaceship to unlock powerful bullet patterns (up to Level 5 with angled shots).
 - **Missile System**: Collect and fire missiles (Press 'M') to clear the screen of enemies.
   - Missiles dynamically target the viewport center, accounting for camera movement
+  - Visual rotation: missile sprite rotates to face its direction of travel
+  - Launch sound effect plays when fired
+  - Fullscreen explosion effect covers entire viewport with expanding wave animation
   - Clear all asteroids, bosses, and enemy projectiles on detonation
 - **Power-ups**: Collect health, ammo, upgrades, and rare missiles.
 - **Boss Battles**: Face off against challenging bosses with unique attack patterns.

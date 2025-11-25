@@ -20,7 +20,10 @@ The project follows a component-based architecture with a scene management syste
 - **Missile**: Screen-clearing projectiles that dynamically target the viewport center.
   - **Dynamic Trajectory**: Calculates viewport center on each update, accounting for camera movement
   - **Movement**: Uses normalized vector math to travel toward the center at constant speed
+  - **Visual Rotation**: Sprite rotates to face its direction of travel for realistic appearance
+  - **Launch Sound**: Plays dedicated missile.wav sound effect on launch
   - **Explosion**: Triggers when reaching within 20 pixels of viewport center
+  - **Fullscreen Effect**: Explosion covers entire viewport with expanding wave animation
 - **PowerUp**: Collectible items (health, ammo, upgrade, missile).
 - **Boss**: Enemy bosses with difficulty tiers and color-coded visual indicators.
   - **Difficulty Tiers**: WEAK (green), MEDIUM (orange), STRONG (red)
