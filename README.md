@@ -89,11 +89,11 @@ The project is organized into a modular structure:
 - **Enter**: Start game / Submit initials.
 
 ## Screenshots
-<img width="798" height="626" alt="space_travel_game_img_1" src="https://github.com/user-attachments/assets/16fc39b4-ace3-49ec-989e-82d9ec793bdb" />
-<img width="797" height="625" alt="space_travel_game_img_2" src="https://github.com/user-attachments/assets/dcfbd159-6a56-4b3e-bad5-99bfb15b6dc2" />
+<img width="1599" height="928" alt="Screenshot 2025-11-25 143151" src="https://github.com/user-attachments/assets/6370c3c3-7fe0-49a2-bd91-adf47fbcee86" />
+<img width="1595" height="926" alt="Screenshot 2025-11-25 143209" src="https://github.com/user-attachments/assets/53eb7c85-eb74-4843-8cd3-9690a775e796" />
+<img width="1596" height="929" alt="Screenshot 2025-11-25 143443" src="https://github.com/user-attachments/assets/bc688336-acac-4f8f-ae45-b3a58246b0f0" />
 
 ## Gameplay
-![Recording 2025-11-23 231412](https://github.com/user-attachments/assets/aaf259ea-efcb-4a8d-a41a-e26cb8a555dc)
-
+![game play](https://github.com/user-attachments/assets/07ebbafb-ad33-42cb-8b22-394664729632)
 
 Enjoy the game! 🚀
